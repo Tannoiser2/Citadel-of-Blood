@@ -6,14 +6,14 @@ class_name MotoreBase
 const D = preload("res://scripts/dati.gd")
 
 var s: Dictionary = {}
-var rng := RandomNumberGenerator.new()
+var rng = RandomNumberGenerator.new()
 var dadi_forzati: Array = []        # tutorial e test: i prossimi tiri di dado
 var tessere_forzate: Array = []     # tutorial: le prossime tessere pescate [id, ...]
 var eventi: Array = []              # per l'interfaccia: dadi, movimenti, danni...
 var tessere: Array = []             # dati delle 100 tessere (data/tessere.json)
 
 func _init() -> void:
-	var f := FileAccess.open("res://data/tessere.json", FileAccess.READ)
+	var f = FileAccess.open("res://data/tessere.json", FileAccess.READ)
 	if f:
 		tessere = JSON.parse_string(f.get_as_text())
 
@@ -33,7 +33,7 @@ func d3() -> int:
 	return int(ceil(d6() / 2.0))
 
 func tira(n: int, facce: int = 6) -> int:
-	var t := 0
+	var t = 0
 	for i in n:
 		t += d3() if facce == 3 else d6()
 	return t
@@ -42,9 +42,9 @@ func tira(n: int, facce: int = 6) -> int:
 func tira_codice(codice: String) -> int:
 	if not "D" in codice:
 		return int(codice)
-	var parti := codice.split("+")
-	var base := parti[0].split("D")
-	var v := tira(int(base[0]), int(base[1]))
+	var parti = codice.split("+")
+	var base = parti[0].split("D")
+	var v = tira(int(base[0]), int(base[1]))
 	if parti.size() > 1:
 		v += int(parti[1])
 	return v
@@ -73,7 +73,7 @@ func pg(id: String) -> Dictionary:
 	return s["gruppo"].get(id, {})
 
 func nome(uid: String) -> String:
-	var u := unita(uid)
+	var u = unita(uid)
 	return u.get("nome", uid)
 
 func pf_residui(u: Dictionary) -> int:
@@ -84,9 +84,9 @@ func vivo(u: Dictionary) -> bool:
 
 ## Personaggi presenti e utilizzabili (non morti, non pietrificati, non prigionieri dell'Hellgate)
 func pg_attivi() -> Array:
-	var r := []
+	var r = []
 	for id in s.get("ordine_ids", []):
-		var p := pg(id)
+		var p = pg(id)
 		if p.is_empty(): continue
 		if p.get("stato", "ok") in ["ok", "incantato", "posseduto"]:
 			r.append(id)
@@ -94,7 +94,7 @@ func pg_attivi() -> Array:
 
 func pg_in_gruppo() -> Array:
 	## solo quelli che marciano col gruppo (non incantati dai mostri)
-	var r := []
+	var r = []
 	for id in pg_attivi():
 		if pg(id).get("stato", "ok") == "ok":
 			r.append(id)
@@ -102,7 +102,7 @@ func pg_in_gruppo() -> Array:
 
 func nuovo_pg_eroe(id: String) -> Dictionary:
 	var e: Dictionary = D.eroe(id)
-	var p := {
+	var p = {
 		"id": id, "nome": e["nome"], "tipo": "eroe", "razza": e["razza"], "ritratto": "h_" + id,
 		"pf_max": e["pf"], "ferite": 0, "pm": e["pm"].duplicate(), "vr": e["vr"], "bc": e["bc"],
 		"armi": [], "arma_att": 0, "abil": e["abil"].duplicate(),
@@ -114,7 +114,7 @@ func nuovo_pg_eroe(id: String) -> Dictionary:
 
 func nuovo_pg_iniziato(id: String, nome_pg: String, razza: String, femmina: bool, arma2: String, esperienza: String, tiro_pm: int) -> Dictionary:
 	var r: Dictionary = D.RAZZE_INIZIATI[razza]
-	var p := {
+	var p = {
 		"id": id, "nome": nome_pg, "tipo": "iniziato", "razza": r["nome"] if not femmina else (r["nome"].substr(0, r["nome"].length() - 1) + "a"),
 		"ritratto": "i_%s_%s" % [razza, "f" if femmina else "m"],
 		"pf_max": r["pf"], "ferite": 0, "pm": D.POTENZIALE[clamp(tiro_pm, 1, 6) - 1].duplicate(), "vr": r["vr"], "bc": 0,
@@ -140,18 +140,18 @@ func max_pm(p: Dictionary) -> int:
 	return int(max(p["pm"][0], max(p["pm"][1], p["pm"][2])))
 
 func pm_sole(p: Dictionary) -> int:
-	var i := D.SOLI.find(s.get("sole", "giallo"))
+	var i = D.SOLI.find(s.get("sole", "giallo"))
 	return int(p["pm"][max(i, 0)])
 
 func bc_totale(p: Dictionary) -> int:
-	var b := int(p["bc"]) + int(p.get("bc_temp", 0))
+	var b = int(p["bc"]) + int(p.get("bc_temp", 0))
 	for o in p.get("oggetti", []):
 		if o.get("tipo") == "medaglione" and o.get("var") == "destrezza":
 			b += 2
 	return b
 
 func vr_totale(u: Dictionary) -> int:
-	var v := int(u.get("vr", 1))
+	var v = int(u.get("vr", 1))
 	for o in u.get("oggetti", []):
 		if o.get("tipo") == "anello" and o.get("var") == "resistenza1": v += 1
 		if o.get("tipo") == "anello" and o.get("var") == "resistenza2": v += 2
@@ -170,17 +170,17 @@ func ha_oggetto(p: Dictionary, tipo: String, variante: String) -> bool:
 	return false
 
 func ricchezza(p: Dictionary) -> int:
-	var t := int(p.get("oro", 0))
+	var t = int(p.get("oro", 0))
 	for g in p.get("gioielli", []):
 		t += int(g)
 	return t
 
 ## Prova di Resistenza (11.0): 1D6 <= VR
 func resiste(uid: String, motivo: String) -> bool:
-	var u := unita(uid)
-	var v := vr_totale(u)
-	var t := d6()
-	var ok := t <= v
+	var u = unita(uid)
+	var v = vr_totale(u)
+	var t = d6()
+	var ok = t <= v
 	mostra_dadi([t], "Resistenza di %s (VR %d)" % [u.get("nome", uid), v])
 	annota("%s tenta di resistere a %s: tira %d contro VR %d, %s." % [u.get("nome", uid), motivo, t, v, "resiste" if ok else "non resiste"], "dado")
 	return ok
@@ -207,12 +207,12 @@ static func chiave(v: Vector2i) -> String:
 	return "%d,%d" % [v.x, v.y]
 
 static func da_chiave(k: String) -> Vector2i:
-	var p := k.split(",")
+	var p = k.split(",")
 	return Vector2i(int(p[0]), int(p[1]))
 
 func mappa(liv: int) -> Dictionary:
 	var m: Dictionary = s["mappe"]
-	var k := str(liv)
+	var k = str(liv)
 	if not m.has(k):
 		m[k] = {"seg": {}, "hub": ""}
 	return m[k]
@@ -225,7 +225,7 @@ func seg_attuale() -> Dictionary:
 
 ## uscite di una faccia ruotata di rot quarti di giro in senso orario
 static func ruota_uscite(u: String, rot: int) -> String:
-	var r := ""
+	var r = ""
 	for i in 4:
 		r += u[(i - rot + 8) % 4]
 	return r
@@ -236,7 +236,7 @@ func faccia(id_tessera: int, lato: String) -> Dictionary:
 	return tessere[id_tessera][lato]
 
 func nuovo_segmento(id_tessera: int, lato: String, rot: int, xy: Vector2i) -> Dictionary:
-	var f := faccia(id_tessera, lato)
+	var f = faccia(id_tessera, lato)
 	return {
 		"t": id_tessera, "lato": lato, "rot": rot, "x": xy.x, "y": xy.y,
 		"uscite": ruota_uscite(f["uscite"], rot),
@@ -261,26 +261,26 @@ func frontiera_aperta(liv: int, extra: Dictionary = {}) -> int:
 	## numero di uscite che portano a celle ancora vuote (6.4: niente vicoli ciechi)
 	var segs: Dictionary = mappa(liv)["seg"].duplicate()
 	for k in extra: segs[k] = extra[k]
-	var n := 0
+	var n = 0
 	for k in segs:
 		var sg: Dictionary = segs[k]
-		var xy := Vector2i(int(sg["x"]), int(sg["y"]))
+		var xy = Vector2i(int(sg["x"]), int(sg["y"]))
 		for d in 4:
 			if uscita(sg, d) == "W": continue
-			var vk := chiave(xy + D.VETTORI[d])
+			var vk = chiave(xy + D.VETTORI[d])
 			if not segs.has(vk):
 				n += 1
 	return n
 
 ## Orientamenti validi di una tessera entrando dal lato `entrata` (direzione dal nuovo segmento verso l'origine)
 func orientamenti(liv: int, id_t: int, lato: String, xy: Vector2i, entrata: int, tipo_ingresso: String, rigoroso: bool) -> Array:
-	var f := faccia(id_t, lato)
-	var validi := []
+	var f = faccia(id_t, lato)
+	var validi = []
 	for rot in 4:
-		var u := ruota_uscite(f["uscite"], rot)
-		var ok := true
+		var u = ruota_uscite(f["uscite"], rot)
+		var ok = true
 		for d in 4:
-			var vicino := segmento(liv, chiave(xy + D.VETTORI[d]))
+			var vicino = segmento(liv, chiave(xy + D.VETTORI[d]))
 			if d == entrata:
 				if tipo_ingresso == "*":
 					if u[d] == "W": ok = false
@@ -288,7 +288,7 @@ func orientamenti(liv: int, id_t: int, lato: String, xy: Vector2i, entrata: int,
 					ok = false
 				continue
 			if vicino.is_empty() or not rigoroso: continue
-			var opposto := uscita(vicino, (d + 2) % 4)
+			var opposto = uscita(vicino, (d + 2) % 4)
 			if vicino.get("ingresso", false): opposto = "W"
 			if not lati_compatibili(u[d], opposto):
 				ok = false
@@ -298,13 +298,13 @@ func orientamenti(liv: int, id_t: int, lato: String, xy: Vector2i, entrata: int,
 
 func pesca_tessera() -> int:
 	if not tessere_forzate.is_empty():
-		var t := int(tessere_forzate.pop_front())
+		var t = int(tessere_forzate.pop_front())
 		s["tazza"].erase(t)
 		return t
 	var tazza: Array = s["tazza"]
 	if tazza.is_empty():
 		return -1
-	var i := rng.randi_range(0, tazza.size() - 1)
+	var i = rng.randi_range(0, tazza.size() - 1)
 	s["rng_stato"] = str(rng.state)
 	var t: int = tazza[i]
 	tazza.remove_at(i)
@@ -322,8 +322,8 @@ func cerca_scala_in_tazza() -> int:
 	return -1
 
 func descrivi_uscite(u: String) -> String:
-	var parti := []
-	var nomi := ["nord", "est", "sud", "ovest"]
+	var parti = []
+	var nomi = ["nord", "est", "sud", "ovest"]
 	for d in 4:
 		if u[d] == "D": parti.append("porta a " + nomi[d])
 		elif u[d] == "C": parti.append("corridoio a " + nomi[d])

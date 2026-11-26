@@ -14,7 +14,7 @@ const PRIORITA_INC := ["bl", "lt", "he", "sl", "cm", "ma", "ms", "rj", "or", "cw
 # ============================================================================================
 ## config: {seme, eroi:[id], iniziati:[{nome, razza, femmina, arma2, esperienza, tiro_pm}], incantesimi:{id:[k]}}
 func nuova_partita(config: Dictionary) -> void:
-	var seme := int(config.get("seme", Time.get_ticks_usec()))
+	var seme = int(config.get("seme", Time.get_ticks_usec()))
 	rng.seed = seme
 	s = {
 		"versione": 1, "seme": seme, "turno": 0, "spedizione": 1, "sole": "giallo",
@@ -28,10 +28,10 @@ func nuova_partita(config: Dictionary) -> void:
 	for id in config.get("eroi", []):
 		s["gruppo"][id] = nuovo_pg_eroe(id)
 		s["ordine_ids"].append(id)
-	var n := 0
+	var n = 0
 	for ini in config.get("iniziati", []):
 		n += 1
-		var id := "ini%d" % n
+		var id = "ini%d" % n
 		var tiro: int = int(ini.get("tiro_pm", 0))
 		if tiro <= 0:
 			tiro = d6()
@@ -41,8 +41,8 @@ func nuova_partita(config: Dictionary) -> void:
 	# incantesimi conosciuti (4.1 B6): tanti quanto il valore più alto del Potenziale Magico
 	var scelti: Dictionary = config.get("incantesimi", {})
 	for id in s["ordine_ids"]:
-		var p := pg(id)
-		var nmax := max_pm(p)
+		var p = pg(id)
+		var nmax = max_pm(p)
 		var lista: Array = scelti.get(id, [])
 		if lista.is_empty():
 			lista = incantesimi_consigliati(p, nmax)
@@ -50,25 +50,25 @@ func nuova_partita(config: Dictionary) -> void:
 	# ordine di marcia iniziale: i più robusti davanti
 	var ids: Array = s["ordine_ids"].duplicate()
 	ids.sort_custom(func(a, b): return _forza_mischia(pg(a)) > _forza_mischia(pg(b)))
-	var o := [["", "", ""], ["", "", ""], ["", "", ""]]
+	var o = [["", "", ""], ["", "", ""], ["", "", ""]]
 	for i in ids.size():
 		o[int(i / 3)][i % 3] = "p:" + ids[i]
 	s["ordine"] = o
 	# il Portale del Male (4.1 F)
-	var porta := {"t": -1, "lato": "portale", "rot": 0, "x": 0, "y": 0, "uscite": "*WWW", "tipo": "portale", "elemento": "",
+	var porta = {"t": -1, "lato": "portale", "rot": 0, "x": 0, "y": 0, "uscite": "*WWW", "tipo": "portale", "elemento": "",
 		"visitato": true, "elemento_usato": true, "mostri": [], "chiuse": [], "hellgate": false, "ingresso": true, "scala_hub": false}
 	mappa(1)["seg"]["0,0"] = porta
 	annota("Il gruppo si raduna davanti al Portale del Male. Comincia la spedizione nella Cittadella di X lo Sconosciuto.", "titolo")
 	inizio_spedizione()
 
 func _forza_mischia(p: Dictionary) -> int:
-	var a := arma(p)
-	var f := int(p["bc"]) + int(p["pf_max"]) + int(p.get("abil", {}).get(a["tipo"], 0)) * 2
+	var a = arma(p)
+	var f = int(p["bc"]) + int(p["pf_max"]) + int(p.get("abil", {}).get(a["tipo"], 0)) * 2
 	if a["tipo"] == "arco": f -= 6
 	return f
 
 func incantesimi_consigliati(p: Dictionary, n: int) -> Array:
-	var r := []
+	var r = []
 	for k in PRIORITA_INC:
 		if r.size() >= n: break
 		r.append(k)
@@ -76,16 +76,16 @@ func incantesimi_consigliati(p: Dictionary, n: int) -> Array:
 
 ## All'ingresso: sole dominante (4.1 D), limiti di Guarigione/Rigenerazione (10.6)
 func inizio_spedizione() -> void:
-	var t := d6()
+	var t = d6()
 	s["sole"] = D.SOLI[int((t - 1) / 2)]
 	mostra_dadi([t], "Sole dominante")
 	annota("Sole dominante: tira %d → %s." % [t, D.NOMI_SOLI[s["sole"]]], "dado")
 	for id in s["ordine_ids"]:
-		var p := pg(id)
+		var p = pg(id)
 		if p.get("stato", "ok") != "ok": continue
 		p["ferite_ingresso"] = p["ferite"]
-		var npm := pm_sole(p)
-		var attivi := []
+		var npm = pm_sole(p)
+		var attivi = []
 		for k in p["inc_noti"]:
 			if attivi.size() < npm: attivi.append(k)
 		for k in ["wg", "rs"]:
@@ -94,15 +94,15 @@ func inizio_spedizione() -> void:
 		p["usi_cura"] = {}
 		for k in ["he", "rj"]:
 			if k in attivi:
-				var u := d6()
+				var u = d6()
 				p["usi_cura"][k] = u
 				annota("%s potrà lanciare %s al massimo %d volte." % [p["nome"], D.INCANTESIMI[k]["nome"], u], "dado")
 	_scelta_soli()
 
 func _scelta_soli() -> void:
-	var maghi := []
+	var maghi = []
 	for id in s["ordine_ids"]:
-		var p := pg(id)
+		var p = pg(id)
 		if p.get("stato", "ok") == "ok" and p["inc_noti"].size() > pm_sole(p) and pm_sole(p) > 0:
 			maghi.append(id)
 	if maghi.is_empty():
@@ -123,7 +123,7 @@ func opzione(id: String) -> Dictionary:
 func scegli(id: String, extra: Dictionary = {}) -> void:
 	var sc: Dictionary = s.get("scelta", {})
 	if sc.is_empty(): return
-	var o := opzione(id)
+	var o = opzione(id)
 	if o.is_empty():
 		push_warning("Opzione inesistente: " + id)
 		return
@@ -152,11 +152,11 @@ func scegli(id: String, extra: Dictionary = {}) -> void:
 func _esegui_soli(extra: Dictionary) -> void:
 	var sel: Dictionary = extra.get("selezione", {})
 	for id in sel:
-		var p := pg(id)
+		var p = pg(id)
 		if p.is_empty(): continue
 		var lista: Array = sel[id]
-		var npm := pm_sole(p)
-		var attivi := []
+		var npm = pm_sole(p)
+		var attivi = []
 		for k in lista:
 			if k in p["inc_noti"] and attivi.size() < npm: attivi.append(k)
 		for k in p["inc_attivi"]:
@@ -196,15 +196,15 @@ func nuovo_turno() -> void:
 	s["incontro"] = {}
 	s["comb"] = {}
 	sistema_ordine()
-	var liv := int(s["pos"]["liv"])
-	var seg := seg_attuale()
-	var xy := da_chiave(s["pos"]["xy"])
-	var opz := []
+	var liv = int(s["pos"]["liv"])
+	var seg = seg_attuale()
+	var xy = da_chiave(s["pos"]["xy"])
+	var opz = []
 	for d in 4:
-		var u := uscita(seg, d)
+		var u = uscita(seg, d)
 		if u == "W": continue
-		var vk := chiave(xy + D.VETTORI[d])
-		var vic := segmento(liv, vk)
+		var vk = chiave(xy + D.VETTORI[d])
+		var vic = segmento(liv, vk)
 		if vic.is_empty():
 			if u == "*":
 				opz.append({"id": "esp|%d|D" % d, "azione": "esplora", "bersaglio": "", "gruppo": "Movimento", "dir": d, "testo": "Entra nella Cittadella da una porta"})
@@ -213,10 +213,10 @@ func nuovo_turno() -> void:
 				opz.append({"id": "esp|%d|%s" % [d, u], "azione": "esplora", "bersaglio": "", "gruppo": "Movimento", "dir": d,
 					"testo": "Esplora a %s (%s)" % [NOMI_DIR[d], "porta" if u == "D" else "corridoio"]})
 		else:
-			var ritorno := uscita(vic, (d + 2) % 4)
+			var ritorno = uscita(vic, (d + 2) % 4)
 			if vic.get("ingresso", false): ritorno = "*"
 			if ritorno == "W" or (ritorno != "*" and u != "*" and ritorno != u): continue
-			var descr := "il Portale" if vic.get("ingresso", false) else ("stanza" if vic["tipo"] == "stanza" else "corridoio")
+			var descr = "il Portale" if vic.get("ingresso", false) else ("stanza" if vic["tipo"] == "stanza" else "corridoio")
 			opz.append({"id": "vai|%d" % d, "azione": "vai", "bersaglio": "", "gruppo": "Movimento", "dir": d,
 				"testo": "Vai a %s (%s già esplorat%s)" % [NOMI_DIR[d], descr, "a" if descr == "stanza" else "o"]})
 	if seg.get("elemento", "") == "scala" and seg["tipo"] == "stanza":
@@ -229,7 +229,7 @@ func nuovo_turno() -> void:
 		opz.append({"id": "esci", "azione": "esci", "bersaglio": "", "gruppo": "Uscita", "testo": "Esci dalla Cittadella"})
 	if seg.get("hellgate", false) and s["hellgate"].get("x_morto", false) and not s["hellgate"].get("distrutta", false):
 		for id in pg_in_gruppo():
-			var p := pg(id)
+			var p = pg(id)
 			if int(p.get("hellgate", 0)) > 0:
 				opz.append({"id": "dis|" + id, "azione": "distruggi", "bersaglio": "p:" + id, "gruppo": "Porta dell'Inferno",
 					"testo": "%s tenta di distruggere la Porta (abilità %d)" % [p["nome"], int(p["hellgate"])]})
@@ -242,7 +242,7 @@ func _esegui_rotta(o: Dictionary) -> void:
 	match parti[0]:
 		"esp": esplora(int(parti[1]), parti[2])
 		"vai":
-			var xy := da_chiave(s["pos"]["xy"]) + D.VETTORI[int(parti[1])]
+			var xy = da_chiave(s["pos"]["xy"]) + D.VETTORI[int(parti[1])]
 			entra(int(s["pos"]["liv"]), chiave(xy), false, uscita(seg_attuale(), int(parti[1])) == "D")
 		"liv": cambia_livello(int(parti[1]))
 		"esci": fine_spedizione()
@@ -250,19 +250,19 @@ func _esegui_rotta(o: Dictionary) -> void:
 
 ## Pesca e piazza una tessera (5.0 A2-A3, 6.1-6.4)
 func esplora(d: int, tipo: String) -> void:
-	var liv := int(s["pos"]["liv"])
-	var xy := da_chiave(s["pos"]["xy"]) + D.VETTORI[d]
-	var lato := "fronte" if tipo == "D" else "retro"
-	var entrata := (d + 2) % 4
-	var rimesse := []
-	var scelta_t := -1
-	var rot_valide := []
-	var tentativi := 0
+	var liv = int(s["pos"]["liv"])
+	var xy = da_chiave(s["pos"]["xy"]) + D.VETTORI[d]
+	var lato = "fronte" if tipo == "D" else "retro"
+	var entrata = (d + 2) % 4
+	var rimesse = []
+	var scelta_t = -1
+	var rot_valide = []
+	var tentativi = 0
 	while true:
-		var t := pesca_tessera()
+		var t = pesca_tessera()
 		if t < 0: break
 		tentativi += 1
-		var rr := orientamenti(liv, t, lato, xy, entrata, tipo, true)
+		var rr = orientamenti(liv, t, lato, xy, entrata, tipo, true)
 		# niente vicoli ciechi prima di trovare la Porta (6.4)
 		if not s["hellgate"]["trovata"]:
 			rr = rr.filter(func(rot): return frontiera_aperta(liv, {chiave(xy): nuovo_segmento(t, lato, rot, xy)}) > 0)
@@ -276,7 +276,7 @@ func esplora(d: int, tipo: String) -> void:
 		# nessuna tessera combacia: si usa quella più adatta, i lati che non combaciano sono impraticabili (6.1)
 		var tazza: Array = s["tazza"]
 		for t in tazza:
-			var rr2 := orientamenti(liv, int(t), lato, xy, entrata, tipo, false)
+			var rr2 = orientamenti(liv, int(t), lato, xy, entrata, tipo, false)
 			if not rr2.is_empty():
 				scelta_t = int(t)
 				rot_valide = rr2
@@ -294,9 +294,9 @@ func esplora(d: int, tipo: String) -> void:
 	if rot_valide.size() == 1:
 		_piazza(rot_valide[0])
 		return
-	var opz := []
+	var opz = []
 	for rot in rot_valide:
-		var u := ruota_uscite(faccia(scelta_t, lato)["uscite"], rot)
+		var u = ruota_uscite(faccia(scelta_t, lato)["uscite"], rot)
 		opz.append({"id": "rot|%d" % rot, "azione": "orienta", "bersaglio": "", "gruppo": "Orientamento", "rot": rot,
 			"testo": "Uscite: " + descrivi_uscite(u)})
 	evento({"tipo": "anteprima", "liv": liv, "xy": chiave(xy), "t": scelta_t, "lato": lato, "rot": rot_valide})
@@ -307,9 +307,9 @@ func _esegui_orienta(o: Dictionary) -> void:
 
 func _piazza(rot: int) -> void:
 	var p: Dictionary = s["pendente"]
-	var liv := int(p["liv"])
-	var xy := da_chiave(p["xy"])
-	var seg := nuovo_segmento(int(p["t"]), p["lato"], rot, xy)
+	var liv = int(p["liv"])
+	var xy = da_chiave(p["xy"])
+	var seg = nuovo_segmento(int(p["t"]), p["lato"], rot, xy)
 	mappa(liv)["seg"][p["xy"]] = seg
 	s["segmenti_esplorati"] = int(s.get("segmenti_esplorati", 0)) + 1
 	evento({"tipo": "tessera", "liv": liv, "xy": p["xy"]})
@@ -319,14 +319,14 @@ func _piazza(rot: int) -> void:
 	entra(liv, p["xy"], true, bool(p["porta"]))
 
 func cambia_livello(dest: int) -> void:
-	var m := mappa(dest)
+	var m = mappa(dest)
 	var hub: String = m.get("hub", "")
-	var nuovo := false
+	var nuovo = false
 	if hub == "":
-		var t := cerca_scala_in_tazza()
+		var t = cerca_scala_in_tazza()
 		if t < 0:
 			t = seg_attuale().get("t", 36)
-		var seg := nuovo_segmento(t, "fronte", 0, Vector2i(0, 0))
+		var seg = nuovo_segmento(t, "fronte", 0, Vector2i(0, 0))
 		seg["scala_hub"] = true
 		m["seg"]["0,0"] = seg
 		m["hub"] = "0,0"
@@ -342,10 +342,10 @@ func cambia_livello(dest: int) -> void:
 
 ## Entrata in un segmento: trappole (B), movimento e mostri (C)
 func entra(liv: int, k: String, nuovo: bool, via_porta: bool) -> void:
-	var seg := segmento(liv, k)
+	var seg = segmento(liv, k)
 	s["entrata"] = {"liv": liv, "xy": k, "nuovo": nuovo, "porta": via_porta, "prima_volta": not seg.get("visitato", false)}
 	if seg["tipo"] == "stanza" and not seg.get("visitato", false):
-		var t := d6()
+		var t = d6()
 		mostra_dadi([t], "Controllo della porta")
 		if t == 1:
 			annota("La porta è protetta da una trappola!", "evento")
@@ -355,15 +355,15 @@ func entra(liv: int, k: String, nuovo: bool, via_porta: bool) -> void:
 	_entra_dopo_trappola()
 
 func _scelta_trappola(cosa: String) -> void:
-	var opz := []
+	var opz = []
 	for id in pg_in_gruppo():
-		var p := pg(id)
-		var dis := int(p.get("disinnesco", 0))
+		var p = pg(id)
+		var dis = int(p.get("disinnesco", 0))
 		opz.append({"id": "tr|" + id + "|", "azione": "trappola", "bersaglio": "p:" + id, "gruppo": "Chi controlla",
 			"testo": "%s %s" % [p["nome"], ("(Disinnesco %d)" % dis) if dis > 0 else "(non sa disinnescare)"]})
 		if dis > 0:
 			for mago in pg_in_gruppo():
-				var pm := pg(mago)
+				var pm = pg(mago)
 				if "tf" in incantesimi_usabili("p:" + mago, ["NC"]):
 					opz.append({"id": "tr|%s|%s" % [id, mago], "azione": "trappola", "bersaglio": "p:" + id, "gruppo": "Con l'incantesimo Ladro",
 						"testo": "%s con Ladro di %s (Disinnesco %d, 1 PF)" % [p["nome"], pm["nome"], mini(dis + 3, 8)]})
@@ -372,19 +372,19 @@ func _scelta_trappola(cosa: String) -> void:
 
 func _esegui_trappola(o: Dictionary) -> void:
 	var parti: PackedStringArray = String(o["id"]).split("|")
-	var id := parti[1]
-	var mago := parti[2]
-	var p := pg(id)
-	var dis := int(p.get("disinnesco", 0))
+	var id = parti[1]
+	var mago = parti[2]
+	var p = pg(id)
+	var dis = int(p.get("disinnesco", 0))
 	if mago != "":
-		var pm := pg(mago)
+		var pm = pg(mago)
 		pm["ferite"] = int(pm["ferite"]) + 1
 		dis += 3
 		annota("%s lancia Ladro su %s." % [pm["nome"], p["nome"]], "magia")
 	dis = mini(dis, 8)
-	var ok := false
+	var ok = false
 	if dis > 0:
-		var t := d6()
+		var t = d6()
 		mostra_dadi([t], "Disinnesco di %s" % p["nome"])
 		ok = t <= dis
 		annota("%s prova a disinnescare: tira %d contro %d → %s." % [p["nome"], t, dis, "disinnescata!" if ok else "scatta!"], "dado")
@@ -403,16 +403,16 @@ func _esegui_trappola(o: Dictionary) -> void:
 
 ## Tabella delle Trappole (7.1, 7.2)
 func scatta_trappola(id: String) -> void:
-	var p := pg(id)
-	var t := d6()
+	var p = pg(id)
+	var t = d6()
 	var tipo: String = D.TRAPPOLE[t - 1]
 	mostra_dadi([t], "Tabella delle trappole")
 	annota("Trappola (tiro %d): %s!" % [t, D.NOMI_TRAPPOLE[tipo]], "evento")
 	evento({"tipo": "trappola", "uid": "p:" + id, "var": tipo})
 	match tipo:
 		"freccia", "freccia_avvelenata":
-			var t2 := d6()
-			var n := D.ferite_crt("arco", t2)
+			var t2 = d6()
+			var n = D.ferite_crt("arco", t2)
 			annota("La freccia (tiro %d sulla colonna Arco) %s." % [t2, "manca %s" % p["nome"] if n == 0 else "colpisce %s: %d ferit%s" % [p["nome"], n, "a" if n == 1 else "e"]], "dado")
 			if n > 0:
 				danneggia("p:" + id, n, "una freccia", false)
@@ -436,7 +436,7 @@ func scatta_trappola(id: String) -> void:
 
 ## Veleno: medaglione/anello Neutralizza Veleno o l'incantesimo (10.6)
 func avvelena(id: String, n: int, fonte: String) -> void:
-	var p := pg(id)
+	var p = pg(id)
 	if ha_oggetto(p, "medaglione", "neutralizza"):
 		annota("Il medaglione rende %s immune a %s." % [p["nome"], fonte], "magia")
 		return
@@ -446,7 +446,7 @@ func avvelena(id: String, n: int, fonte: String) -> void:
 			annota("%s usa l'Anello Neutralizza Veleno contro %s." % [p["nome"], fonte], "magia")
 			return
 	for mago in pg_in_gruppo():
-		var pm := pg(mago)
+		var pm = pg(mago)
 		if "np" in incantesimi_usabili("p:" + mago, ["NC"]) and pf_residui(pm) > 2:
 			pm["ferite"] = int(pm["ferite"]) + 1
 			annota("%s lancia subito Neutralizza veleno su %s." % [pm["nome"], p["nome"]], "magia")
@@ -456,9 +456,9 @@ func avvelena(id: String, n: int, fonte: String) -> void:
 
 func _entra_dopo_trappola() -> void:
 	var e: Dictionary = s["entrata"]
-	var liv := int(e["liv"])
+	var liv = int(e["liv"])
 	var k: String = e["xy"]
-	var seg := segmento(liv, k)
+	var seg = segmento(liv, k)
 	s["prec"] = s["pos"].duplicate()
 	s["pos"] = {"liv": liv, "xy": k}
 	var era_visitato: bool = seg.get("visitato", false)
@@ -487,7 +487,7 @@ func _entra_dopo_trappola() -> void:
 		annota("I mostri incontrati qui in precedenza sono ancora presenti.", "evento")
 		apri_incontro(lista, "ritorno", via_porta_attuale())
 		return
-	var t := d6()
+	var t = d6()
 	var prima_volta: bool = seg["tipo"] == "stanza" and not era_visitato
 	mostra_dadi([t], "Controllo dei mostri")
 	if prima_volta and t <= 3:
@@ -508,7 +508,7 @@ func via_porta_attuale() -> bool:
 # Incontri: negoziazione e corruzione (8.4 - 8.9)
 # ============================================================================================
 func apri_incontro(mostri: Array, origine: String, via_porta: bool, opz: Dictionary = {}) -> void:
-	var dict := {}
+	var dict = {}
 	for m in mostri:
 		dict[m["uid"]] = m
 	s["incontro"] = {"mostri": dict, "origine": origine, "porta": via_porta, "negoziato": false, "corrotto": false,
@@ -519,7 +519,7 @@ func apri_incontro(mostri: Array, origine: String, via_porta: bool, opz: Diction
 
 func _mostro_rappresentativo() -> Dictionary:
 	var inc: Dictionary = s["incontro"]
-	var best := {}
+	var best = {}
 	for k in inc["mostri"]:
 		var m: Dictionary = inc["mostri"][k]
 		if best.is_empty() or int(m["pf_max"]) > int(best["pf_max"]): best = m
@@ -530,11 +530,11 @@ func _scelta_incontro() -> void:
 	if inc["mostri"].is_empty():
 		_chiudi_incontro()
 		return
-	var m := _mostro_rappresentativo()
+	var m = _mostro_rappresentativo()
 	var trattabile: bool = int(m["vn"]) >= 0 and not inc["no_trattativa"]
-	var opz := []
-	var squadra := pg_in_gruppo() if inc["solo"] == "" else [inc["solo"]]
-	var testo_m := _descrivi_mostri()
+	var opz = []
+	var squadra = pg_in_gruppo() if inc["solo"] == "" else [inc["solo"]]
+	var testo_m = _descrivi_mostri()
 	if inc["esito"] in ["accordo", "intimidazione"]:
 		opz.append({"id": "lascia", "azione": "lascia", "bersaglio": "", "gruppo": "Prosegui", "testo": "Lasciali in pace e prosegui"})
 		opz.append({"id": "attacca", "azione": "combatti", "bersaglio": "", "gruppo": "Combatti", "testo": "Attaccali comunque"})
@@ -542,8 +542,8 @@ func _scelta_incontro() -> void:
 		return
 	if trattabile and not inc["negoziato"]:
 		for id in squadra:
-			var p := pg(id)
-			var bonus := int(p.get("negoziazione", 0)) + int(inc["oratoria"])
+			var p = pg(id)
+			var bonus = int(p.get("negoziazione", 0)) + int(inc["oratoria"])
 			if ha_oggetto(p, "medaglione", "oratoria"): bonus += 3
 			opz.append({"id": "neg|" + id, "azione": "negozia", "bersaglio": "p:" + id, "gruppo": "Negozia",
 				"testo": "%s negozia (2D6 − %d %+d)" % [p["nome"], int(m["vn"]), bonus]})
@@ -576,7 +576,7 @@ func _scelta_incontro() -> void:
 			break
 	# pozioni di fascino (14.5)
 	for id in squadra:
-		var p2 := pg(id)
+		var p2 = pg(id)
 		for i in p2["oggetti"].size():
 			var ob: Dictionary = p2["oggetti"][i]
 			if ob.get("tipo") != "pozione": continue
@@ -589,7 +589,7 @@ func _scelta_incontro() -> void:
 						opz.append({"id": "poz|%s|%d|%s" % [id, i, k], "azione": "pozione", "bersaglio": k, "gruppo": "Pozioni",
 							"testo": "%s beve la %s su %s" % [p2["nome"], D.NOMI_POZIONI[ob["var"]], inc["mostri"][k]["nome"]]})
 	opz.append({"id": "comb", "azione": "combatti", "bersaglio": "", "gruppo": "Combatti", "testo": "Combatti!"})
-	var info := ""
+	var info = ""
 	if not trattabile and int(m["vn"]) < 0:
 		info = " Con demoni e con X lo Sconosciuto non si tratta: si combatte."
 	elif inc["negoziato"]:
@@ -598,36 +598,36 @@ func _scelta_incontro() -> void:
 
 func _descrivi_mostri() -> String:
 	var inc: Dictionary = s["incontro"]
-	var conta := {}
+	var conta = {}
 	for k in inc["mostri"]:
 		var t: String = inc["mostri"][k]["tipo"]
 		conta[t] = int(conta.get(t, 0)) + 1
-	var parti := []
+	var parti = []
 	for t in conta:
 		parti.append(("%d %s" % [conta[t], D.MOSTRI[t]["plur"]]) if int(conta[t]) > 1 else D.MOSTRI[t]["nome"])
 	return ", ".join(parti)
 
 func _oro_gruppo() -> int:
-	var t := 0
+	var t = 0
 	for id in pg_in_gruppo():
 		t += int(pg(id).get("oro", 0))
 	return t
 
 func _togli_oro(n: int) -> void:
-	var resto := n
-	var ids := pg_in_gruppo()
+	var resto = n
+	var ids = pg_in_gruppo()
 	ids.sort_custom(func(a, b): return int(pg(a)["oro"]) > int(pg(b)["oro"]))
 	for id in ids:
-		var p := pg(id)
-		var x := mini(int(p["oro"]), resto)
+		var p = pg(id)
+		var x = mini(int(p["oro"]), resto)
 		p["oro"] = int(p["oro"]) - x
 		resto -= x
 		if resto <= 0: break
 
 func _dai_oro(n: int) -> void:
-	var ids := pg_in_gruppo()
+	var ids = pg_in_gruppo()
 	if ids.is_empty() or n <= 0: return
-	var parte := int(n / ids.size())
+	var parte = int(n / ids.size())
 	for i in ids.size():
 		pg(ids[i])["oro"] = int(pg(ids[i])["oro"]) + parte + (n % ids.size() if i == 0 else 0)
 
@@ -637,8 +637,8 @@ func _esegui_incontro(o: Dictionary) -> void:
 	match parti[0]:
 		"neg": negozia(parti[1])
 		"incn", "incb":
-			var p := pg(parti[1])
-			var k := parti[2]
+			var p = pg(parti[1])
+			var k = parti[2]
 			annota("%s lancia %s." % [p["nome"], D.INCANTESIMI[k]["nome"]], "magia")
 			if not paga(p, k):
 				_scelta_incontro()
@@ -658,7 +658,7 @@ func _esegui_incontro(o: Dictionary) -> void:
 					_scelta_incontro()
 				"cw", "dn":
 					inc["negoziato"] = true
-					var m := _mostro_rappresentativo()
+					var m = _mostro_rappresentativo()
 					if resiste(m["uid"], D.INCANTESIMI[k]["nome"]):
 						annota("I mostri non si lasciano intimorire.")
 						_scelta_incontro()
@@ -680,14 +680,14 @@ func _esegui_incontro(o: Dictionary) -> void:
 			_lascia_mostri()
 			_chiudi_incontro()
 		"lock":
-			var p2 := pg(parti[1])
+			var p2 = pg(parti[1])
 			p2["ferite"] = int(p2["ferite"]) + 1
 			var prec: Dictionary = s["prec"]
-			var da := da_chiave(prec["xy"])
-			var a := da_chiave(s["pos"]["xy"])
-			var d := D.VETTORI.find(a - da)
+			var da = da_chiave(prec["xy"])
+			var a = da_chiave(s["pos"]["xy"])
+			var d = D.VETTORI.find(a - da)
 			if d >= 0 and int(prec["liv"]) == int(s["pos"]["liv"]):
-				var sp := segmento(int(prec["liv"]), prec["xy"])
+				var sp = segmento(int(prec["liv"]), prec["xy"])
 				sp["chiuse"].append(d)
 				seg_attuale()["chiuse"].append((d + 2) % 4)
 			_lascia_mostri()
@@ -697,20 +697,20 @@ func _esegui_incontro(o: Dictionary) -> void:
 			s["incontro"] = {}
 			nuovo_turno()
 		"tele":
-			var p3 := pg(parti[1])
-			var k2 := parti[2]
+			var p3 = pg(parti[1])
+			var k2 = parti[2]
 			if not paga(p3, "tl"):
 				_scelta_incontro()
 				return
 			var m2: Dictionary = inc["mostri"][k2]
 			inc["mostri"].erase(k2)
-			var dest := _segmento_a_caso_visitato()
+			var dest = _segmento_a_caso_visitato()
 			if dest != "":
 				segmento(int(s["pos"]["liv"]), dest)["mostri"].append(m2)
 			annota("%s teletrasporta %s in un'altra parte del labirinto." % [p3["nome"], m2["nome"]], "magia")
 			_scelta_incontro()
 		"poz":
-			var p4 := pg(parti[1])
+			var p4 = pg(parti[1])
 			var ob: Dictionary = p4["oggetti"][int(parti[2])]
 			p4["oggetti"].remove_at(int(parti[2]))
 			var m3: Dictionary = inc["mostri"][parti[3]]
@@ -730,7 +730,7 @@ func prosegui_o(f: Callable) -> void:
 		f.call()
 
 func _segmento_a_caso_visitato() -> String:
-	var lista := []
+	var lista = []
 	var seg: Dictionary = mappa(int(s["pos"]["liv"]))["seg"]
 	for k in seg:
 		if seg[k].get("visitato", false) and k != s["pos"]["xy"] and not seg[k].get("ingresso", false):
@@ -741,14 +741,14 @@ func _segmento_a_caso_visitato() -> String:
 func negozia(id: String) -> void:
 	var inc: Dictionary = s["incontro"]
 	inc["negoziato"] = true
-	var p := pg(id)
-	var m := _mostro_rappresentativo()
-	var a := d6()
-	var b := d6()
-	var bonus := int(p.get("negoziazione", 0)) + int(inc["oratoria"])
+	var p = pg(id)
+	var m = _mostro_rappresentativo()
+	var a = d6()
+	var b = d6()
+	var bonus = int(p.get("negoziazione", 0)) + int(inc["oratoria"])
 	if ha_oggetto(p, "medaglione", "oratoria"): bonus += 3
-	var tot := a + b - int(m["vn"]) + bonus
-	var esito := D.esito_negoziazione(tot)
+	var tot = a + b - int(m["vn"]) + bonus
+	var esito = D.esito_negoziazione(tot)
 	mostra_dadi([a, b], "Negoziazione")
 	annota("%s negozia: %d+%d − %d (Valore di Negoziazione) %+d = %d → %s." % [p["nome"], a, b, int(m["vn"]), bonus, tot,
 		{"fallimento": "Fallimento", "accordo": "Accordo", "intimidazione": "Intimidazione"}[esito]], "dado")
@@ -768,30 +768,30 @@ func negozia(id: String) -> void:
 
 func _tesoro_da_incontro(frazione: float) -> void:
 	var inc: Dictionary = s["incontro"]
-	var oro := 0
+	var oro = 0
 	for k in inc["mostri"]:
-		var t := genera_tesoro(inc["mostri"][k]["tesoro"])
+		var t = genera_tesoro(inc["mostri"][k]["tesoro"])
 		if frazione >= 1.0:
 			_aggiungi_tesoro(t)
 		else:
 			oro += int(t["oro"])
 	if frazione < 1.0:
-		var parte := int(oro * frazione)
+		var parte = int(oro * frazione)
 		_dai_oro(parte)
 		annota("Il gruppo riceve %d marchi d'oro." % parte)
 
 func _scelta_corruzione() -> void:
-	var m := _mostro_rappresentativo()
-	var v := int(m["pf_max"]) - int(m["ferite"]) + int(m["vn"])
-	var col := D.colonna_corruzione(v)
-	var oro := _oro_gruppo()
-	var opz := []
+	var m = _mostro_rappresentativo()
+	var v = int(m["pf_max"]) - int(m["ferite"]) + int(m["vn"])
+	var col = D.colonna_corruzione(v)
+	var oro = _oro_gruppo()
+	var opz = []
 	for i in D.CORRUZIONE_OFFERTE.size():
 		var off: int = D.CORRUZIONE_OFFERTE[i]
 		if off > oro: break
 		var serve: int = D.CORRUZIONE[i][col]
-		var sconto := int(s["incontro"]["sconto"])
-		var prob := clampi(serve + sconto, 0, 6)
+		var sconto = int(s["incontro"]["sconto"])
+		var prob = clampi(serve + sconto, 0, 6)
 		opz.append({"id": "off|%d" % off, "azione": "offri", "bersaglio": "", "gruppo": "Offerta",
 			"testo": "Offri %d marchi (riesce con %s: %d su 6)" % [off, ("1D6 ≤ %d" % serve) + (" (−%d)" % sconto if sconto > 0 else ""), prob]})
 	opz.append({"id": "annulla", "azione": "annulla", "bersaglio": "", "gruppo": "Altro", "testo": "Non offrire nulla"})
@@ -804,13 +804,13 @@ func _esegui_corruzione(o: Dictionary) -> void:
 		_scelta_incontro()
 		return
 	inc["corrotto"] = true
-	var off := int(String(o["id"]).split("|")[1])
-	var m := _mostro_rappresentativo()
-	var v := int(m["pf_max"]) - int(m["ferite"]) + int(m["vn"])
-	var col := D.colonna_corruzione(v)
+	var off = int(String(o["id"]).split("|")[1])
+	var m = _mostro_rappresentativo()
+	var v = int(m["pf_max"]) - int(m["ferite"]) + int(m["vn"])
+	var col = D.colonna_corruzione(v)
 	var serve: int = D.CORRUZIONE[D.CORRUZIONE_OFFERTE.find(off)][col]
-	var t := d6()
-	var tot := t - int(inc["sconto"])
+	var t = d6()
+	var tot = t - int(inc["sconto"])
 	_togli_oro(off)
 	mostra_dadi([t], "Corruzione")
 	annota("Il gruppo offre %d marchi: tira %d%s = %d contro %d → %s." % [off, t, (" − %d" % int(inc["sconto"])) if int(inc["sconto"]) > 0 else "", tot, serve,
@@ -824,29 +824,29 @@ func _esegui_corruzione(o: Dictionary) -> void:
 
 func _lascia_mostri() -> void:
 	var inc: Dictionary = s["incontro"]
-	var seg := seg_attuale()
+	var seg = seg_attuale()
 	for k in inc["mostri"]:
 		seg["mostri"].append(inc["mostri"][k])
 
 func _combatti_incontro(mostri_primi: bool, oro_corruzione: int = 0) -> void:
 	var inc: Dictionary = s["incontro"]
-	var lista := []
+	var lista = []
 	for k in inc["mostri"]:
 		lista.append(inc["mostri"][k])
-	var opz := {"mostri_primi": mostri_primi, "oro_corruzione": oro_corruzione, "solo": inc.get("solo", ""),
+	var opz = {"mostri_primi": mostri_primi, "oro_corruzione": oro_corruzione, "solo": inc.get("solo", ""),
 		"unisci_dal_round": inc.get("unisci_dal_round", 0)}
 	_inizia_con_esitazione(lista, opz)
 
 ## Esitazione (10.5): prima del combattimento si possono usare cure. Si offre se qualcuno la conosce.
 func _inizia_con_esitazione(lista: Array, opz: Dictionary) -> void:
 	s["comb_attesa"] = {"mostri": lista, "opz": opz}
-	var maghi := []
+	var maghi = []
 	for id in pg_in_gruppo():
 		if "hs" in incantesimi_usabili("p:" + id, ["C"]):
 			maghi.append(id)
-	var feriti := pg_in_gruppo().filter(func(x): return int(pg(x)["ferite"]) > 0)
+	var feriti = pg_in_gruppo().filter(func(x): return int(pg(x)["ferite"]) > 0)
 	if not maghi.is_empty() and not feriti.is_empty() and opz.get("solo", "") == "":
-		var o := [{"id": "no", "testo": "Combatti subito", "azione": "no", "bersaglio": "", "gruppo": ""}]
+		var o = [{"id": "no", "testo": "Combatti subito", "azione": "no", "bersaglio": "", "gruppo": ""}]
 		o.append({"id": "si|" + maghi[0], "testo": "%s lancia Esitazione (2 PF): un momento per curarsi" % pg(maghi[0])["nome"], "azione": "si", "bersaglio": "", "gruppo": ""})
 		s["scelta"] = {"tipo": "si_no", "tag": "esitazione", "testo": "Il combattimento sta per cominciare.", "opzioni": o}
 		return
@@ -858,7 +858,7 @@ func _avvia_comb_attesa() -> void:
 	s["incontro"]["mostri"] = {}
 	# pozioni o incantesimi della Forza preparati (14.5)
 	for id in pg_in_gruppo():
-		var p := pg(id)
+		var p = pg(id)
 		if int(p.get("forza_prossimo", 0)) > 0:
 			p["bc_temp"] = int(p.get("bc_temp", 0)) + int(p["forza_prossimo"])
 			annota("%s combatte con +%d al Bonus di Combattimento (Forza)." % [p["nome"], int(p["forza_prossimo"])])
@@ -880,13 +880,13 @@ func _chiudi_incontro() -> void:
 # Porta dell'Inferno (16.0)
 # ============================================================================================
 func battaglia_hellgate() -> void:
-	var liv := int(s["pos"]["liv"])
-	var n := d3() + 2
+	var liv = int(s["pos"]["liv"])
+	var n = d3() + 2
 	annota("Ecco la PORTA DELL'INFERNO! X lo Sconosciuto e %d demoni la difendono." % n, "titolo")
 	evento({"tipo": "hellgate"})
-	var lista := []
+	var lista = []
 	for i in n:
-		var dm := crea_mostro("demone", liv, false)
+		var dm = crea_mostro("demone", liv, false)
 		lista.append(dm)
 	lista.append(crea_mostro("x", liv, false))
 	s["incontro"] = {"mostri": {}, "origine": "hellgate", "porta": false, "negoziato": true, "corrotto": true, "oratoria": 0, "sconto": 0,
@@ -894,9 +894,9 @@ func battaglia_hellgate() -> void:
 	_inizia_con_esitazione(lista, {"hellgate": true})
 
 func tenta_distruzione(id: String) -> void:
-	var p := pg(id)
-	var t := d6()
-	var abil := int(p.get("hellgate", 0))
+	var p = pg(id)
+	var t = d6()
+	var abil = int(p.get("hellgate", 0))
 	mostra_dadi([t], "Distruzione della Porta")
 	if t <= abil:
 		s["hellgate"]["distrutta"] = true
@@ -923,7 +923,7 @@ func fine_combattimento(esito: String) -> void:
 	evento({"tipo": "combattimento", "fine": true, "esito": esito})
 	# pulizia degli effetti temporanei
 	for id in s["ordine_ids"]:
-		var p := pg(id)
+		var p = pg(id)
 		p["bc_temp"] = 0
 		p["scudo_magico"] = false
 		p["pugnale_lanciato"] = false
@@ -931,7 +931,7 @@ func fine_combattimento(esito: String) -> void:
 	# gli incantati dai mostri restano dalla parte dei mostri solo se il gruppo perde
 	for uid in unita_in(c["ordine_m"]):
 		if uid.begins_with("p:") and esito != "sconfitta":
-			var pp := unita(uid)
+			var pp = unita(uid)
 			if pp.get("stato", "") in ["incantato", "posseduto"]:
 				pp["stato"] = "ok"
 				pp.erase("incantato_da")
@@ -941,11 +941,11 @@ func fine_combattimento(esito: String) -> void:
 				annota("%s non è riuscito a cavarsela da solo." % pg(c["solo"])["nome"], "morte")
 			else:
 				for id in s["ordine_ids"]:
-					var p2 := pg(id)
+					var p2 = pg(id)
 					if p2.get("stato", "ok") in ["pietra", "incantato", "posseduto"]:
 						p2["stato"] = "morto"
 		"tregua":
-			var rimasti := []
+			var rimasti = []
 			for uid in c["mostri"]:
 				var m: Dictionary = c["mostri"][uid]
 				if m.get("stato", "ok") == "ok" and vivo(m):
@@ -959,9 +959,9 @@ func fine_combattimento(esito: String) -> void:
 
 func _scelta_rianimazione() -> void:
 	var c: Dictionary = s["comb"]
-	var opz := []
+	var opz = []
 	for id in s["ordine_ids"]:
-		var p := pg(id)
+		var p = pg(id)
 		if p.get("stato", "") == "pietra":
 			for mago in pg_in_gruppo():
 				if mago != id and "sf" in incantesimi_usabili("p:" + mago, ["NC"]):
@@ -969,7 +969,7 @@ func _scelta_rianimazione() -> void:
 						"testo": "%s lancia Pietra in carne su %s (3 PF)" % [pg(mago)["nome"], p["nome"]]})
 		if p.get("stato", "") == "morto" and id in c.get("caduti", []):
 			for mago in pg_in_gruppo():
-				var pm := pg(mago)
+				var pm = pg(mago)
 				if "rs" in pm.get("inc_attivi", []) and pf_residui(pm) > 5:
 					opz.append({"id": "rs|%s|%s" % [mago, id], "azione": "rianima", "bersaglio": "p:" + id, "gruppo": "Resurrezione",
 						"testo": "%s lancia Resurrezione su %s (5 PF)" % [pm["nome"], p["nome"]]})
@@ -988,8 +988,8 @@ func _esegui_rianima(o: Dictionary) -> void:
 	if parti[0] == "basta":
 		_dopo_rianimazione()
 		return
-	var mago := pg(parti[1])
-	var p := pg(parti[2])
+	var mago = pg(parti[1])
+	var p = pg(parti[2])
 	match parti[0]:
 		"sf":
 			if paga(mago, "sf"):
@@ -1014,7 +1014,7 @@ func _esegui_rianima(o: Dictionary) -> void:
 func _dopo_rianimazione() -> void:
 	var c: Dictionary = s["comb"]
 	for id in s["ordine_ids"]:
-		var p := pg(id)
+		var p = pg(id)
 		if p.get("stato", "") == "pietra":
 			p["stato"] = "morto"
 			annota("Nessuno può spezzare l'incantesimo: %s resta una statua per sempre." % p["nome"], "morte")
@@ -1022,10 +1022,10 @@ func _dopo_rianimazione() -> void:
 	var inc: Dictionary = s.get("incontro", {})
 	if esito == "vittoria" and not c["uccisi"].is_empty():
 		# esperienza (12.0)
-		var vivi := pg_in_gruppo()
+		var vivi = pg_in_gruppo()
 		if not vivi.is_empty():
-			var liv := clampi(int(s["pos"]["liv"]), 1, 3)
-			var xp := int(int(c["pf_iniziali"]) * 6 / vivi.size()) * int(D.LIVELLI["xp"][liv - 1])
+			var liv = clampi(int(s["pos"]["liv"]), 1, 3)
+			var xp = int(int(c["pf_iniziali"]) * 6 / vivi.size()) * int(D.LIVELLI["xp"][liv - 1])
 			for id in vivi:
 				pg(id)["xp"] = int(pg(id)["xp"]) + xp
 			annota("Ogni sopravvissuto guadagna %d punti esperienza." % xp, "evento")
@@ -1063,7 +1063,7 @@ func _apri_forzieri() -> void:
 		prosegui()
 		return
 	var lettera: String = f[0]
-	var t := d6()
+	var t = d6()
 	mostra_dadi([t], "Forziere")
 	if t <= 3:
 		annota("Il tesoro (tipo %s) è in un forziere protetto da una trappola!" % lettera, "evento")
@@ -1086,42 +1086,42 @@ func _dopo_forziere() -> void:
 # Tesori (14.0 - 14.9)
 # --------------------------------------------------------------------------------------------
 func _voce_tesoro(v: Array) -> int:
-	var soglia := int(v[0])
+	var soglia = int(v[0])
 	if soglia <= 0: return 0
-	var t := d6()
+	var t = d6()
 	if t > soglia: return 0
-	var dadi := int(v[1])
-	var facce := int(v[2])
-	var molt := int(v[3])
+	var dadi = int(v[1])
+	var facce = int(v[2])
+	var molt = int(v[3])
 	if facce == 0: return dadi
 	return tira(dadi, facce) * molt
 
 func genera_tesoro(lettera: String) -> Dictionary:
 	var tab: Array = D.TESORI.get(lettera, D.TESORI["A"])
-	var oro := _voce_tesoro(tab[0])
-	var ng := _voce_tesoro(tab[1])
-	var no := _voce_tesoro(tab[2])
-	var gioielli := []
+	var oro = _voce_tesoro(tab[0])
+	var ng = _voce_tesoro(tab[1])
+	var no = _voce_tesoro(tab[2])
+	var gioielli = []
 	for i in ng:
-		var a := d6()
-		var b := d6()
+		var a = d6()
+		var b = d6()
 		gioielli.append(int(D.GIOIELLI[a + b]))
-	var oggetti := []
+	var oggetti = []
 	for i in no:
 		oggetti.append(crea_oggetto())
 	return {"oro": oro, "gioielli": gioielli, "oggetti": oggetti, "lettera": lettera}
 
 func crea_oggetto(tipo_forzato: String = "") -> Dictionary:
-	var tipo := tipo_forzato
+	var tipo = tipo_forzato
 	if tipo == "":
 		tipo = D.OGGETTI_TIPI[d6() - 1]
-	var t := d6()
+	var t = d6()
 	var v = D.OGGETTI[tipo][t - 1]
-	var o := {"tipo": tipo, "var": v}
+	var o = {"tipo": tipo, "var": v}
 	match tipo:
 		"arma":
-			var bonus := 0
-			var tiri := 1
+			var bonus = 0
+			var tiri = 1
 			while tiri > 0:
 				tiri -= 1
 				var b: int = D.BONUS_ARMA[d6() - 1]
@@ -1130,9 +1130,9 @@ func crea_oggetto(tipo_forzato: String = "") -> Dictionary:
 			o["bonus"] = bonus
 			o["nome"] = "%s +%d" % [D.nome_arma(v), bonus]
 		"armatura":
-			var bonus2 := 0
+			var bonus2 = 0
 			if int(v) == 0:
-				var tiri2 := 2
+				var tiri2 = 2
 				while tiri2 > 0:
 					tiri2 -= 1
 					var b2: int = D.OGGETTI["armatura"][d6() - 1]
@@ -1155,12 +1155,12 @@ func crea_oggetto(tipo_forzato: String = "") -> Dictionary:
 	return o
 
 func _aggiungi_tesoro(t: Dictionary) -> void:
-	var parti := []
+	var parti = []
 	if int(t["oro"]) > 0:
 		_dai_oro(int(t["oro"]))
 		parti.append("%d marchi d'oro" % int(t["oro"]))
 	for g in t["gioielli"]:
-		var vivi := pg_in_gruppo()
+		var vivi = pg_in_gruppo()
 		if vivi.is_empty(): break
 		var povero: String = vivi[0]
 		for id in vivi:
@@ -1186,12 +1186,12 @@ func _distribuisci_prossimo() -> void:
 		prosegui()
 		return
 	var o: Dictionary = b[0]
-	var opz := []
-	var verbo := "prende"
+	var opz = []
+	var verbo = "prende"
 	if o["tipo"] in ["pozione", "medaglione"]: verbo = "prova"
 	for id in pg_in_gruppo():
-		var p := pg(id)
-		var nota := ""
+		var p = pg(id)
+		var nota = ""
 		if o["tipo"] == "arma" and p["armi"].size() >= 2: nota = " (dovrà lasciare un'arma)"
 		opz.append({"id": "a|" + id, "azione": "assegna", "bersaglio": "p:" + id, "gruppo": "A chi",
 			"testo": "%s %s%s" % [p["nome"], verbo, nota]})
@@ -1205,10 +1205,10 @@ func _esegui_tesoro(o: Dictionary, sc: Dictionary) -> void:
 		annota("Il gruppo lascia %s." % ob.get("nome", "l'oggetto"))
 		_distribuisci_prossimo()
 		return
-	var id := String(o["id"]).split("|")[1]
-	var p := pg(id)
+	var id = String(o["id"]).split("|")[1]
+	var p = pg(id)
 	if ob["tipo"] == "arma" and p["armi"].size() >= 2:
-		var opz := []
+		var opz = []
 		for i in p["armi"].size():
 			opz.append({"id": "s|%d" % i, "azione": "sostituisci", "bersaglio": "", "gruppo": "", "testo": "Lascia %s" % D.nome_arma(p["armi"][i]["tipo"])})
 		opz.append({"id": "no", "azione": "no", "bersaglio": "", "gruppo": "", "testo": "Non prenderla"})
@@ -1222,7 +1222,7 @@ func _esegui_arma_sost(o: Dictionary, sc: Dictionary) -> void:
 	var id: String = sc["chi"]
 	var ob: Dictionary = sc["oggetto"]
 	if o["id"] != "no":
-		var i := int(String(o["id"]).split("|")[1])
+		var i = int(String(o["id"]).split("|")[1])
 		pg(id)["armi"].remove_at(i)
 		pg(id)["arma_att"] = 0
 		ricevi_oggetto(id, ob)
@@ -1231,7 +1231,7 @@ func _esegui_arma_sost(o: Dictionary, sc: Dictionary) -> void:
 
 ## Effetti dell'oggetto quando un personaggio lo prende o lo prova (14.3 - 14.8)
 func ricevi_oggetto(id: String, ob: Dictionary) -> void:
-	var p := pg(id)
+	var p = pg(id)
 	match ob["tipo"]:
 		"arma":
 			p["armi"].append({"tipo": ob["var"], "bonus": int(ob["bonus"])})
@@ -1251,8 +1251,8 @@ func ricevi_oggetto(id: String, ob: Dictionary) -> void:
 					ob["usi"] = d6()
 					annota("Potrà usarlo %d volte in questa partita." % int(ob["usi"]))
 				"sole_giallo", "sole_blu", "sole_rosso":
-					var i := D.SOLI.find(String(ob["var"]).substr(5))
-					var n := d3()
+					var i = D.SOLI.find(String(ob["var"]).substr(5))
+					var n = d3()
 					p["pm"][i] = int(p["pm"][i]) + n
 					annota("Il Potenziale Magico di %s per il %s sale di %d." % [p["nome"], D.SOLI[i], n])
 					_aggiorna_incantesimi_attivi(p)
@@ -1281,10 +1281,10 @@ func ricevi_oggetto(id: String, ob: Dictionary) -> void:
 			annota("%s infila %s." % [p["nome"], ob["nome"]], "tesoro")
 
 func _aggiorna_incantesimi_attivi(p: Dictionary) -> void:
-	var npm := pm_sole(p)
-	var nmax := max_pm(p)
+	var npm = pm_sole(p)
+	var nmax = max_pm(p)
 	while p["inc_noti"].size() < nmax:
-		var nuovo := ""
+		var nuovo = ""
 		for k in PRIORITA_INC:
 			if not k in p["inc_noti"]:
 				nuovo = k
@@ -1292,7 +1292,7 @@ func _aggiorna_incantesimi_attivi(p: Dictionary) -> void:
 		if nuovo == "": break
 		p["inc_noti"].append(nuovo)
 	for k in p["inc_noti"]:
-		var normali := p["inc_attivi"].filter(func(x): return not x in ["wg", "rs"]).size()
+		var normali = p["inc_attivi"].filter(func(x): return not x in ["wg", "rs"]).size()
 		if normali >= npm: break
 		if not k in p["inc_attivi"]:
 			p["inc_attivi"].append(k)
@@ -1300,8 +1300,8 @@ func _aggiorna_incantesimi_attivi(p: Dictionary) -> void:
 				p["usi_cura"][k] = d6()
 
 func bevi_pozione(id: String, ob: Dictionary, prova: bool) -> void:
-	var p := pg(id)
-	var stima := ha_oggetto(p, "medaglione", "stima_pozioni")
+	var p = pg(id)
+	var stima = ha_oggetto(p, "medaglione", "stima_pozioni")
 	if prova and stima:
 		if ob["var"] == "veleno":
 			annota("Il Medaglione della Stima rivela che è veleno: %s la getta via." % p["nome"], "magia")
@@ -1315,23 +1315,23 @@ func bevi_pozione(id: String, ob: Dictionary, prova: bool) -> void:
 		"veleno":
 			avvelena(id, d3(), "la pozione velenosa")
 		"forza":
-			var n := d6()
+			var n = d6()
 			p["forza_prossimo"] = n
 			annota("+%d al Bonus di Combattimento nel prossimo scontro." % n)
 		"guarigione":
-			var n2 := mini(d6(), int(p["ferite"]))
+			var n2 = mini(d6(), int(p["ferite"]))
 			p["ferite"] = int(p["ferite"]) - n2
 			annota("%s guarisce %d ferit%s." % [p["nome"], n2, "a" if n2 == 1 else "e"])
 		"fascino_persone", "fascino_mostri":
 			annota("Non c'è nessuno da affascinare: l'effetto svanisce.")
 	if prova and ob["var"] != "veleno":
-		var copia := ob.duplicate()
+		var copia = ob.duplicate()
 		copia["dosi"] = 1
 		p["oggetti"].append(copia)
 		annota("%s conserva una dose." % p["nome"])
 
 func _combatti_posseduto(id: String) -> void:
-	var uid := "p:" + id
+	var uid = "p:" + id
 	togli_da_ordine(s["ordine"], uid)
 	s["incontro"] = {"mostri": {}, "origine": "posseduto", "porta": false, "negoziato": true, "corrotto": true, "oratoria": 0, "sconto": 0,
 		"seguito": s.get("seguito_comb", "turno"), "solo": "", "no_trattativa": true, "unisci_dal_round": 0, "esito": ""}
@@ -1341,12 +1341,12 @@ func _combatti_posseduto(id: String) -> void:
 # Elementi delle stanze (13.0)
 # ============================================================================================
 func fase_elemento() -> void:
-	var seg := seg_attuale()
+	var seg = seg_attuale()
 	var el: String = seg.get("elemento", "")
 	if seg["tipo"] != "stanza" or el == "" or el == "scala" or seg.get("elemento_usato", false):
 		nuovo_turno()
 		return
-	var opz := []
+	var opz = []
 	for id in pg_in_gruppo():
 		opz.append({"id": "ind|" + id, "azione": "indaga", "bersaglio": "p:" + id, "gruppo": "Chi indaga", "testo": "%s indaga" % pg(id)["nome"]})
 	opz.append({"id": "no", "azione": "no", "bersaglio": "", "gruppo": "Altro", "testo": "Non indagare e prosegui"})
@@ -1360,17 +1360,17 @@ func _esegui_elemento(o: Dictionary) -> void:
 	if o["id"] == "no":
 		nuovo_turno()
 		return
-	var id := String(o["id"]).split("|")[1]
-	var seg := seg_attuale()
+	var id = String(o["id"]).split("|")[1]
+	var seg = seg_attuale()
 	seg["elemento_usato"] = true
 	indaga(id, seg["elemento"])
 
 func indaga(id: String, el: String) -> void:
-	var p := pg(id)
+	var p = pg(id)
 	if el == "specchio":
 		specchio()
 		return
-	var t := d6()
+	var t = d6()
 	var r: String = D.TABELLA_ELEMENTI[el][t - 1]
 	mostra_dadi([t], "Tabella degli elementi")
 	annota("%s indaga %s: tira %d → %s." % [p["nome"], D.ELEMENTI[el].to_lower(), t, D.NOMI_RISULTATI[r]], "dado")
@@ -1392,13 +1392,13 @@ func _fine_elemento(testo: String) -> void:
 	conferma(testo)
 
 func _fontana(id: String, r: String) -> void:
-	var p := pg(id)
+	var p = pg(id)
 	match r:
 		"veleno":
 			avvelena(id, d3(), "l'acqua avvelenata")
 			_fine_elemento("La fontana era avvelenata.")
 		"pozione":
-			var ob := crea_oggetto("pozione")
+			var ob = crea_oggetto("pozione")
 			bevi_pozione(id, ob, true)
 			_fine_elemento("Dalla fontana sgorga una pozione magica.")
 		"alcol":
@@ -1406,9 +1406,9 @@ func _fontana(id: String, r: String) -> void:
 			annota("%s è ubriaco: −2 al Bonus di Combattimento per il resto della partita." % p["nome"])
 			_fine_elemento("Un liquore magico potentissimo!")
 		"gioiello":
-			var a := d6()
-			var b := d6()
-			var v := int(D.GIOIELLI[a + b])
+			var a = d6()
+			var b = d6()
+			var v = int(D.GIOIELLI[a + b])
 			p["gioielli"].append(v)
 			annota("Nell'acqua brilla un gioiello da %d marchi: lo prende %s." % [v, p["nome"]], "tesoro")
 			_fine_elemento("Un gioiello nella vasca!")
@@ -1420,7 +1420,7 @@ func _fontana(id: String, r: String) -> void:
 			_fine_elemento("La fontana versa sangue.")
 
 func _statua(id: String, r: String) -> void:
-	var p := pg(id)
+	var p = pg(id)
 	match r:
 		"medusa":
 			annota("La statua prende vita: è una Medusa!", "evento")
@@ -1435,8 +1435,8 @@ func _statua(id: String, r: String) -> void:
 			apri_incontro([crea_mostro("medusa", int(s["pos"]["liv"]), false)], "elemento", false, {"seguito": "turno"})
 		"gioielli":
 			for i in 2:
-				var a := d6()
-				var b := d6()
+				var a = d6()
+				var b = d6()
 				p["gioielli"].append(int(D.GIOIELLI[a + b]))
 			annota("%s prende i due gioielli: %d e %d marchi." % [p["nome"], p["gioielli"][-2], p["gioielli"][-1]], "tesoro")
 			_fine_elemento("Una statua di ariete con due gemme per occhi.")
@@ -1444,12 +1444,12 @@ func _statua(id: String, r: String) -> void:
 			ricevi_oggetto(id, crea_oggetto("medaglione"))
 			_fine_elemento("Al collo della statua pende un medaglione.")
 		"demone":
-			var t := d6()
+			var t = d6()
 			var r2: String = D.TABELLA_ELEMENTI["altare"][t - 1]
 			annota("È la statua di un demone (tiro %d): %s." % [t, D.NOMI_RISULTATI[r2]], "dado")
 			_altare(id, r2)
 		"talismano":
-			var ob := crea_oggetto("talismano")
+			var ob = crea_oggetto("talismano")
 			ricevi_oggetto(id, ob)
 			if s.get("comb", {}).is_empty() and s.get("scelta", {}).is_empty():
 				_fine_elemento("Al collo della statua pende un talismano.")
@@ -1466,14 +1466,14 @@ func _statua(id: String, r: String) -> void:
 func _pietrificato_fuori_comb(id: String) -> void:
 	for mago in pg_in_gruppo():
 		if mago != id and "sf" in incantesimi_usabili("p:" + mago, ["NC"]):
-			var pm := pg(mago)
+			var pm = pg(mago)
 			if paga(pm, "sf"):
 				pg(id)["stato"] = "ok"
 				annota("%s spezza la pietrificazione con Pietra in carne." % pm["nome"], "magia")
 				return
 
 func _botola(id: String, r: String) -> void:
-	var p := pg(id)
+	var p = pg(id)
 	match r:
 		"trappola":
 			annota("La botola è protetta da una trappola.")
@@ -1482,7 +1482,7 @@ func _botola(id: String, r: String) -> void:
 		"stanza":
 			annota("%s precipita in una stanza segreta sotto il pavimento!" % p["nome"], "evento")
 			s["botola_chi"] = id
-			var t := d6()
+			var t = d6()
 			mostra_dadi([t], "Controllo dei mostri")
 			if t <= 3:
 				annota("Tiro %d: la stanza è abitata. %s dovrà cavarsela da solo." % [t, p["nome"]], "dado")
@@ -1493,8 +1493,8 @@ func _botola(id: String, r: String) -> void:
 		"fossa":
 			annota("%s cade in una fossa piena di Cronk!" % p["nome"], "evento")
 			s["botola_chi"] = id
-			var n := d3()
-			var lista := []
+			var n = d3()
+			var lista = []
 			for i in n:
 				lista.append(crea_mostro("cronk", int(s["pos"]["liv"]), false))
 			s["botola_tesoro"] = false
@@ -1508,8 +1508,8 @@ func _botola(id: String, r: String) -> void:
 
 func _scelta_trappola_su(id: String, cosa: String) -> void:
 	# la trappola della botola o dello scrittoio colpisce chi indaga: può tentare di disinnescarla
-	var p := pg(id)
-	var opz := [{"id": "tr|" + id + "|", "azione": "trappola", "bersaglio": "p:" + id, "gruppo": "",
+	var p = pg(id)
+	var opz = [{"id": "tr|" + id + "|", "azione": "trappola", "bersaglio": "p:" + id, "gruppo": "",
 		"testo": "%s %s" % [p["nome"], ("prova a disinnescarla (Disinnesco %d)" % int(p["disinnesco"])) if int(p["disinnesco"]) > 0 else "non sa disinnescarla"]}]
 	if int(p["disinnesco"]) > 0:
 		for mago in pg_in_gruppo():
@@ -1534,7 +1534,7 @@ func _dopo_trappola_elemento(cosa: String) -> void:
 func _botola_risali() -> void:
 	var id: String = s.get("botola_chi", "")
 	s.erase("botola_chi")
-	var p := pg(id)
+	var p = pg(id)
 	if not p.is_empty() and vivo(p) and p.get("stato", "ok") == "ok":
 		if s.get("botola_tesoro", true):
 			annota("Nella stanza segreta c'è un tesoro (tipo J).", "evento")
@@ -1545,18 +1545,18 @@ func _botola_risali() -> void:
 	_fine_elemento("Avventura sotto la botola conclusa.")
 
 func _mobili(id: String, r: String) -> void:
-	var p := pg(id)
+	var p = pg(id)
 	match r:
 		"bara":
 			annota("Dalla bara si leva un Vampiro! %s deve affrontarlo subito; dal secondo round il gruppo può aiutarlo." % p["nome"], "evento")
-			var v := crea_mostro("vampiro", int(s["pos"]["liv"]), false)
+			var v = crea_mostro("vampiro", int(s["pos"]["liv"]), false)
 			s["incontro"] = {"mostri": {}, "origine": "bara", "porta": false, "negoziato": true, "corrotto": true, "oratoria": 0, "sconto": 0,
 				"seguito": "turno", "solo": id, "no_trattativa": true, "unisci_dal_round": 2, "esito": ""}
 			_inizia_con_esitazione([v], {"solo": id, "unisci_dal_round": 2})
 		"libreria":
-			var t := d6()
+			var t = d6()
 			if t <= 3:
-				var n := d3()
+				var n = d3()
 				annota("La libreria crolla addosso a %s (tiro %d): %d ferit%s." % [p["nome"], t, n, "a" if n == 1 else "e"], "dado")
 				danneggia("p:" + id, n, "la libreria", false)
 				_fine_elemento("La libreria era marcia.")
@@ -1569,7 +1569,7 @@ func _mobili(id: String, r: String) -> void:
 			s["botola_chi"] = id
 			_scelta_trappola_su(id, "scrittoio")
 		"letto":
-			var n2 := mini(d3(), int(p["ferite"]))
+			var n2 = mini(d3(), int(p["ferite"]))
 			p["ferite"] = int(p["ferite"]) - n2
 			annota("%s riposa nel letto magico e guarisce %d ferit%s." % [p["nome"], n2, "a" if n2 == 1 else "e"])
 			_fine_elemento("Un letto magico.")
@@ -1577,7 +1577,7 @@ func _mobili(id: String, r: String) -> void:
 			if resiste("p:" + id, "l'incanto del clavicembalo"):
 				_fine_elemento("Il clavicembalo suona da solo, ma %s non si lascia ammaliare." % p["nome"])
 			else:
-				var meta := int(int(p["oro"]) / 2)
+				var meta = int(int(p["oro"]) / 2)
 				p["oro"] = int(p["oro"]) - meta
 				if meta > 0:
 					annota("Ammaliato dalla musica, %s infila %d marchi nello strumento." % [p["nome"], meta])
@@ -1595,8 +1595,8 @@ func _impara_speciale(p: Dictionary, k: String) -> void:
 	if not k in p["inc_attivi"]: p["inc_attivi"].append(k)
 
 func _altare(id: String, r: String) -> void:
-	var p := pg(id)
-	var ok := resiste("p:" + id, "l'altare di " + D.NOMI_RISULTATI[r].split(",")[0])
+	var p = pg(id)
+	var ok = resiste("p:" + id, "l'altare di " + D.NOMI_RISULTATI[r].split(",")[0])
 	match r:
 		"alloces":
 			if ok:
@@ -1637,8 +1637,8 @@ func _altare(id: String, r: String) -> void:
 				annota("Tre frecce magiche colpiscono %s!" % p["nome"], "magia")
 				for i in 3:
 					if not vivo(p): break
-					var t := d6()
-					var n := D.ferite_crt("arco", t)
+					var t = d6()
+					var n = D.ferite_crt("arco", t)
 					annota("Freccia magica: tiro %d → %d ferit%s." % [t, n, "a" if n == 1 else "e"], "dado")
 					danneggia("p:" + id, n, "le frecce di Leraje", false)
 		"asmoday":
@@ -1652,7 +1652,7 @@ func _altare(id: String, r: String) -> void:
 					p["pm"][i] = maxi(0, int(p["pm"][i]) - 1)
 				annota("Maledizione di Asmoday: il Potenziale Magico di %s cala di 1 sotto ogni sole." % p["nome"], "magia")
 				while p["inc_attivi"].filter(func(x): return not x in ["wg", "rs"]).size() > pm_sole(p):
-					var tolto := ""
+					var tolto = ""
 					for k in p["inc_attivi"]:
 						if not k in ["wg", "rs"]: tolto = k
 					p["inc_attivi"].erase(tolto)
@@ -1663,12 +1663,12 @@ func _impara_inc(p: Dictionary, k: String) -> void:
 	if not k in p["inc_attivi"]: p["inc_attivi"].append(k)
 
 func _opera(id: String, r: String) -> void:
-	var p := pg(id)
+	var p = pg(id)
 	match r:
 		"arazzo":
-			var a := d6()
-			var b := d6()
-			var v := int(D.GIOIELLI[mini(a + b + 4, 12)])
+			var a = d6()
+			var b = d6()
+			var v = int(D.GIOIELLI[mini(a + b + 4, 12)])
 			s["scelta"] = {"tipo": "si_no", "tag": "arazzo", "chi": id, "valore": v,
 				"testo": "Un arazzo elfico del valore di %d marchi. %s può prenderlo lasciando una delle sue armi." % [v, p["nome"]],
 				"opzioni": []}
@@ -1678,26 +1678,26 @@ func _opera(id: String, r: String) -> void:
 		"dipinto":
 			annota("Un dipinto raffigura un gruppo di figure... ognuno tira un dado.")
 			for x in pg_in_gruppo():
-				var t := d6()
+				var t = d6()
 				if t == 1:
-					var n := d3()
+					var n = d3()
 					annota("%s si riconosce nel dipinto: è maledetto e subisce %d ferit%s." % [pg(x)["nome"], n, "a" if n == 1 else "e"], "evento")
 					danneggia("p:" + x, n, "la maledizione del dipinto", false)
 			_fine_elemento("Il dipinto maledetto.")
 		"statua":
-			var t2 := d6()
+			var t2 = d6()
 			var r2: String = D.TABELLA_ELEMENTI["statua"][t2 - 1]
 			annota("Una grande statua (tiro %d): %s." % [t2, D.NOMI_RISULTATI[r2]], "dado")
 			_statua(id, r2)
 		"vetro":
-			var t3 := d6()
-			var tipo := "talismano" if t3 <= 3 else "medaglione"
+			var t3 = d6()
+			var tipo = "talismano" if t3 <= 3 else "medaglione"
 			annota("Il vetro intagliato (tiro %d) è un %s." % [t3, tipo])
 			ricevi_oggetto(id, crea_oggetto(tipo))
 			if s.get("comb", {}).is_empty() and s.get("scelta", {}).is_empty():
 				_fine_elemento("Un oggetto di vetro intagliato.")
 		"icona":
-			var t4 := d6()
+			var t4 = d6()
 			var r3: String = D.TABELLA_ELEMENTI["altare"][t4 - 1]
 			annota("Un'icona di demone (tiro %d): %s." % [t4, D.NOMI_RISULTATI[r3]], "dado")
 			_altare(id, r3)
@@ -1710,8 +1710,8 @@ func _esegui_si_no(o: Dictionary, sc: Dictionary) -> void:
 	match sc.get("tag", ""):
 		"esitazione":
 			if String(o["id"]).begins_with("si"):
-				var id := String(o["id"]).split("|")[1]
-				var p := pg(id)
+				var id = String(o["id"]).split("|")[1]
+				var p = pg(id)
 				if paga(p, "hs"):
 					annota("%s lancia Esitazione: il gruppo ha il tempo di curarsi prima dello scontro." % p["nome"], "magia")
 					s["scelta"] = {"tipo": "si_no", "tag": "esitazione_fatta", "testo": "Usa ora le cure (pannello del personaggio: incantesimi e oggetti), poi comincia il combattimento.",
@@ -1723,16 +1723,16 @@ func _esegui_si_no(o: Dictionary, sc: Dictionary) -> void:
 			s.erase("esitazione")
 			_avvia_comb_attesa()
 		"clavicembalo":
-			var p2 := pg(sc["chi"])
+			var p2 = pg(sc["chi"])
 			if o["id"] == "si":
 				p2["oro"] = int(p2["oro"]) + int(sc["oro"])
 				annota("%s riapre lo strumento e si riprende l'oro." % p2["nome"])
 				danneggia("p:" + p2["id"], 1, "le corde del clavicembalo", false)
 			_fine_elemento("Il clavicembalo tace.")
 		"arazzo":
-			var p3 := pg(sc["chi"])
+			var p3 = pg(sc["chi"])
 			if String(o["id"]).begins_with("si"):
-				var i := int(String(o["id"]).split("|")[1])
+				var i = int(String(o["id"]).split("|")[1])
 				p3["armi"].remove_at(i)
 				p3["arma_att"] = 0
 				p3["gioielli"].append(int(sc["valore"]))
@@ -1744,12 +1744,12 @@ func _esegui_si_no(o: Dictionary, sc: Dictionary) -> void:
 # --------------------------------------------------------------------------------------------
 func specchio() -> void:
 	var hg: Dictionary = s["hellgate"]
-	var liv := int(s["pos"]["liv"])
+	var liv = int(s["pos"]["liv"])
 	if hg["trovata"]:
 		_fine_elemento("Lo specchio riflette solo il gruppo: la Porta è già stata trovata.")
 		return
 	if int(hg["liv"]) == 0:
-		var t := d6()
+		var t = d6()
 		var r: Array = D.SPECCHIO[t - 1]
 		hg["liv"] = int(r[0])
 		mostra_dadi([t], "Tabella dello specchio")
@@ -1767,8 +1767,8 @@ func specchio() -> void:
 	_fine_elemento("Lo specchio resta opaco: non rivela nulla di nuovo.")
 
 func _specchio_segmenti() -> void:
-	var t := d6()
-	var n := int(D.SPECCHIO[t - 1][1])
+	var t = d6()
+	var n = int(D.SPECCHIO[t - 1][1])
 	s["hellgate"]["conto"] = n
 	mostra_dadi([t], "Segmenti di distanza")
 	annota("Lo specchio rivela la distanza (tiro %d): la Porta sarà il %d° segmento inesplorato in cui entrerete su questo livello." % [t, n], "evento")
@@ -1788,45 +1788,45 @@ func puo_agire_fuori_combattimento() -> bool:
 
 ## Incantesimi lanciabili ora da un personaggio: [[k, [bersagli id]]]
 func incantesimi_fuori(id: String) -> Array:
-	var r := []
+	var r = []
 	if not puo_agire_fuori_combattimento(): return r
-	var p := pg(id)
+	var p = pg(id)
 	if p.get("stato", "ok") != "ok": return r
 	for k in incantesimi_usabili("p:" + id, ["NC"]):
 		match k:
 			"he", "rj":
-				var b := pg_in_gruppo().filter(func(x): return x != id and int(pg(x)["ferite"]) > 0)
+				var b = pg_in_gruppo().filter(func(x): return x != id and int(pg(x)["ferite"]) > 0)
 				if not b.is_empty(): r.append([k, b])
 			"mr", "st":
 				r.append([k, pg_in_gruppo()])
 	return r
 
 func lancia_fuori(id: String, k: String, bers: String) -> void:
-	var p := pg(id)
-	var b := pg(bers)
+	var p = pg(id)
+	var b = pg(bers)
 	if not paga(p, k): return
 	match k:
 		"he", "rj":
 			p["usi_cura"][k] = int(p["usi_cura"].get(k, 0)) - 1
-			var n := (d3() + 1) if k == "he" else (d6() + 1)
+			var n = (d3() + 1) if k == "he" else (d6() + 1)
 			n = mini(n, int(b["ferite"]))
 			b["ferite"] = int(b["ferite"]) - n
 			annota("%s lancia %s su %s: guarisce %d ferit%s." % [p["nome"], D.INCANTESIMI[k]["nome"], b["nome"], n, "a" if n == 1 else "e"], "magia")
 		"mr":
-			var n2 := d3() + 1
+			var n2 = d3() + 1
 			b["armatura_magica"] = int(b.get("armatura_magica", 0)) + n2
 			annota("%s lancia Armatura magica su %s: assorbirà %d ferite." % [p["nome"], b["nome"], n2], "magia")
 		"st":
-			var n3 := d6()
+			var n3 = d6()
 			b["forza_prossimo"] = n3
 			annota("%s lancia Forza su %s: +%d al Bonus di Combattimento nel prossimo scontro." % [p["nome"], b["nome"], n3], "magia")
 	evento({"tipo": "aggiorna"})
 
 ## Oggetti usabili ora: [[indice, testo]]
 func oggetti_usabili(id: String) -> Array:
-	var r := []
+	var r = []
 	if not puo_agire_fuori_combattimento(): return r
-	var p := pg(id)
+	var p = pg(id)
 	for i in p.get("oggetti", []).size():
 		var o: Dictionary = p["oggetti"][i]
 		if o.get("tipo") == "pozione" and o.get("var") in ["guarigione", "forza"]:
@@ -1836,14 +1836,14 @@ func oggetti_usabili(id: String) -> Array:
 	return r
 
 func usa_oggetto(id: String, i: int) -> void:
-	var p := pg(id)
+	var p = pg(id)
 	var o: Dictionary = p["oggetti"][i]
 	if o.get("tipo") == "pozione":
 		p["oggetti"].remove_at(i)
 		bevi_pozione(id, o, false)
 	elif o.get("tipo") == "anello":
 		o["usato"] = true
-		var n := mini(d3() + 1, int(p["ferite"]))
+		var n = mini(d3() + 1, int(p["ferite"]))
 		p["ferite"] = int(p["ferite"]) - n
 		annota("%s usa l'Anello di Guarigione: guarisce %d ferit%s." % [p["nome"], n, "a" if n == 1 else "e"], "magia")
 	evento({"tipo": "aggiorna"})
@@ -1853,12 +1853,12 @@ func sposta_fuori(uid: String, col: int, riga: int) -> void:
 	if in_combattimento(): return
 	var o: Array = s["ordine"]
 	var altro: String = o[riga][col]
-	var da := fila_di(o, uid)
+	var da = fila_di(o, uid)
 	if da.x < 0: return
 	o[da.y][da.x] = altro
 	o[riga][col] = uid
 	compatta(o)
-	var conta := 0
+	var conta = 0
 	for x in o[0]:
 		if x != "": conta += 1
 	if conta < 2 and unita_in(o).size() >= 2:
@@ -1873,9 +1873,9 @@ func sposta_fuori(uid: String, col: int, riga: int) -> void:
 # ============================================================================================
 func _controlla_sconfitta() -> bool:
 	if s.get("fine", "") != "": return true
-	var vivi := s["ordine_ids"].filter(func(x): return pg(x).get("stato", "ok") in ["ok"])
+	var vivi = s["ordine_ids"].filter(func(x): return pg(x).get("stato", "ok") in ["ok"])
 	if vivi.is_empty():
-		var prig := s["ordine_ids"].filter(func(x): return pg(x).get("stato", "") == "prigioniero")
+		var prig = s["ordine_ids"].filter(func(x): return pg(x).get("stato", "") == "prigioniero")
 		s["fine"] = "sconfitta"
 		annota("Il gruppo è stato annientato nella Cittadella di Sangue." + (" I prigionieri della Porta non rivedranno mai la luce." if not prig.is_empty() else ""), "titolo")
 		s["scelta"] = {"tipo": "fine", "testo": "Sconfitta: nessuno è uscito vivo.", "opzioni": [{"id": "nuova", "testo": "Nuova partita", "azione": "nuova", "bersaglio": "", "gruppo": ""}]}
@@ -1884,16 +1884,16 @@ func _controlla_sconfitta() -> bool:
 	return false
 
 func costo_miglioramento(p: Dictionary, bc: bool) -> int:
-	var base := 150 if bc else 100
-	var extra := maxi(0, int(p.get("uscite", 0)) - 3)
+	var base = 150 if bc else 100
+	var extra = maxi(0, int(p.get("uscite", 0)) - 3)
 	return int(base * (1.0 + 0.1 * extra))
 
 func vincitori() -> Array:
-	var cand := []
+	var cand = []
 	for id in s["ordine_ids"]:
-		var p := pg(id)
+		var p = pg(id)
 		if p.get("stato", "") != "ok": continue
-		var ric := ricchezza(p) + int(s["casa"].get(id, {}).get("oro", 0))
+		var ric = ricchezza(p) + int(s["casa"].get(id, {}).get("oro", 0))
 		if int(p["xp"]) >= 100 and ric >= 100:
 			cand.append([id, int(p["xp"]) + ric])
 	cand.sort_custom(func(a, b): return a[1] > b[1])
@@ -1902,7 +1902,7 @@ func vincitori() -> Array:
 func fine_spedizione() -> void:
 	annota("Il gruppo esce dalla Cittadella attraverso il Portale del Male.", "titolo")
 	for id in s["ordine_ids"]:
-		var p := pg(id)
+		var p = pg(id)
 		if p.get("stato", "") != "ok": continue
 		p["uscite"] = int(p.get("uscite", 0)) + 1
 		var casa: Dictionary = s["casa"].get(id, {"oro": 0})
@@ -1910,8 +1910,8 @@ func fine_spedizione() -> void:
 		s["casa"][id] = casa
 		p["oro"] = 0
 		p["gioielli"] = []
-	var v := vincitori()
-	var testo := ""
+	var v = vincitori()
+	var testo = ""
 	if s["hellgate"]["distrutta"]:
 		s["fine"] = "vittoria"
 		testo = "VITTORIA! La Porta dell'Inferno è distrutta e il gruppo è uscito vivo per raccontarlo."
@@ -1924,7 +1924,7 @@ func fine_spedizione() -> void:
 	_scelta_riposo(testo)
 
 func _scelta_riposo(testo: String) -> void:
-	var opz := []
+	var opz = []
 	if s["fine"] != "vittoria":
 		opz.append({"id": "migliora", "testo": "Spendi esperienza e oro per migliorare", "azione": "migliora", "bersaglio": "", "gruppo": ""})
 		opz.append({"id": "rientra", "testo": "Torna nella Cittadella (campagna)", "azione": "rientra", "bersaglio": "", "gruppo": ""})
@@ -1942,16 +1942,16 @@ func _esegui_riposo(o: Dictionary) -> void:
 			s["scelta"] = {"tipo": "fine", "testo": "Partita conclusa.", "opzioni": [{"id": "nuova", "testo": "Nuova partita", "azione": "nuova", "bersaglio": "", "gruppo": ""}]}
 
 func _scelta_migliora() -> void:
-	var opz := []
+	var opz = []
 	for id in s["ordine_ids"]:
-		var p := pg(id)
+		var p = pg(id)
 		if p.get("stato", "") != "ok": continue
-		var oro := int(s["casa"].get(id, {}).get("oro", 0))
-		var c1 := costo_miglioramento(p, false)
-		var c2 := costo_miglioramento(p, true)
+		var oro = int(s["casa"].get(id, {}).get("oro", 0))
+		var c1 = costo_miglioramento(p, false)
+		var c2 = costo_miglioramento(p, true)
 		if int(p["xp"]) >= c1 and oro >= c1:
 			opz.append({"id": "m|%s|pf" % id, "testo": "%s: +1 Punto Ferita (%d PE e %d oro)" % [p["nome"], c1, c1], "azione": "m", "bersaglio": "p:" + id, "gruppo": p["nome"]})
-			var a := arma(p)
+			var a = arma(p)
 			opz.append({"id": "m|%s|arma" % id, "testo": "%s: +1 con %s" % [p["nome"], D.nome_arma(a["tipo"])], "azione": "m", "bersaglio": "p:" + id, "gruppo": p["nome"]})
 			if vr_totale(p) < 5 and int(p["vr"]) < 5:
 				opz.append({"id": "m|%s|vr" % id, "testo": "%s: +1 Resistenza" % p["nome"], "azione": "m", "bersaglio": "p:" + id, "gruppo": p["nome"]})
@@ -1970,9 +1970,9 @@ func _esegui_migliora(o: Dictionary) -> void:
 		_scelta_riposo("Miglioramenti conclusi.")
 		return
 	var parti: PackedStringArray = String(o["id"]).split("|")
-	var p := pg(parti[1])
-	var bc := parti[2] == "bc"
-	var costo := costo_miglioramento(p, bc)
+	var p = pg(parti[1])
+	var bc = parti[2] == "bc"
+	var costo = costo_miglioramento(p, bc)
 	p["xp"] = int(p["xp"]) - costo
 	s["casa"][p["id"]]["oro"] = int(s["casa"][p["id"]]["oro"]) - costo
 	match parti[2]:
@@ -1986,7 +1986,7 @@ func _esegui_migliora(o: Dictionary) -> void:
 		"bc": p["bc"] = int(p["bc"]) + 1
 		_:
 			if parti[2].begins_with("pm"):
-				var i := int(parti[2].substr(2))
+				var i = int(parti[2].substr(2))
 				p["pm"][i] = int(p["pm"][i]) + 1
 	annota("%s migliora: %s." % [p["nome"], o["testo"].split(": ")[1]], "evento")
 	_scelta_migliora()
@@ -1995,7 +1995,7 @@ func rientra() -> void:
 	s["spedizione"] = int(s["spedizione"]) + 1
 	s["alleati"] = {}
 	for id in s["ordine_ids"]:
-		var p := pg(id)
+		var p = pg(id)
 		if p.get("stato", "") == "ok":
 			p["ferite"] = 0
 			p["armatura_magica"] = 0
@@ -2003,16 +2003,16 @@ func rientra() -> void:
 			for o in p["oggetti"]:
 				if o.get("tipo") == "anello": o["usato"] = false
 	# si torna a sei (17.3) con nuovi iniziati
-	var vivi := s["ordine_ids"].filter(func(x): return pg(x).get("stato", "") == "ok")
-	var n := s["ordine_ids"].size()
-	var razze := ["umano", "nano", "elfo"]
+	var vivi = s["ordine_ids"].filter(func(x): return pg(x).get("stato", "") == "ok")
+	var n = s["ordine_ids"].size()
+	var razze = ["umano", "nano", "elfo"]
 	while vivi.size() < 6:
 		n += 1
 		var razza: String = razze[n % 3]
 		var nomi: Array = D.NOMI_INIZIATI[razza]
-		var femmina := n % 2 == 0
-		var id := "ini%d" % n
-		var p2 := nuovo_pg_iniziato(id, nomi[n % nomi.size()], razza, femmina, "pugnale", "pf", d6())
+		var femmina = n % 2 == 0
+		var id = "ini%d" % n
+		var p2 = nuovo_pg_iniziato(id, nomi[n % nomi.size()], razza, femmina, "pugnale", "pf", d6())
 		p2["inc_noti"] = incantesimi_consigliati(p2, max_pm(p2))
 		s["gruppo"][id] = p2
 		s["ordine_ids"].append(id)

@@ -2,7 +2,7 @@
 extends SceneTree
 
 const D = preload("res://scripts/dati.gd")
-var falliti := 0
+var falliti = 0
 
 func verifica(cond: bool, testo: String) -> void:
 	if cond:
@@ -20,7 +20,7 @@ func _init() -> void:
 	verifica(D.CORRUZIONE[4][2] == 4, "corruzione 100 marchi, colonna 10-12 → 4")
 	verifica(D.lettera_tesoro("C", 2) == "E", "tesoro C al livello 3 diventa E")
 	verifica(Motore.ruota_uscite("DWCW", 1) == "WDWC", "rotazione delle uscite")
-	var m := Motore.new()
+	var m = Motore.new()
 	verifica(m.tessere.size() == 100, "100 tessere caricate")
 	m.nuova_partita({"seme": 5, "eroi": ["almuric", "gislan", "dalmilandril"], "iniziati": [
 		{"nome": "A", "razza": "umano", "arma2": "pugnale", "esperienza": "pf", "tiro_pm": 6},
@@ -35,20 +35,20 @@ func _init() -> void:
 		"ordine_m": [["m:1", "m:2", ""], ["", "", ""], ["", "", ""]], "solo": ""}
 	m.s["ordine"] = [["p:almuric", "p:gislan", "p:dalmilandril"], ["p:ini1", "p:ini2", "p:ini3"], ["", "", ""]]
 	verifica(m.bersagli("m:1") == ["p:almuric"], "9.3: A attacca 1")
-	var bb := m.bersagli("m:2")
+	var bb = m.bersagli("m:2")
 	verifica(bb.size() == 2 and "p:gislan" in bb and "p:dalmilandril" in bb, "9.3: B sceglie tra 2 e 3")
 	m.s["comb"]["ordine_m"] = [["", "m:1", ""], ["", "", ""], ["", "", ""]]
 	verifica(m.bersagli("m:1").size() == 3, "9.3: un solo mostro al centro può colpire tutti e tre")
 	verifica(m.bersagli("p:almuric") == ["m:1"], "9.3: il personaggio a sinistra colpisce il mostro al centro")
 	# prova di tutte le tessere: ogni faccia ha almeno un'uscita
-	var vuote := 0
+	var vuote = 0
 	for t in m.tessere:
 		if t["fronte"]["uscite"] == "WWWW" or t["retro"]["uscite"] == "WWWW": vuote += 1
 	verifica(vuote == 0, "ogni faccia di tessera ha almeno un'uscita")
 	# tesori: 200 estrazioni di tipo L non danno errori e producono oggetti validi
-	var ogg := 0
+	var ogg = 0
 	for k in 200:
-		var t2 := m.genera_tesoro("L")
+		var t2 = m.genera_tesoro("L")
 		ogg += t2["oggetti"].size()
 		for o in t2["oggetti"]:
 			if not o.has("nome"): falliti += 1

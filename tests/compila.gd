@@ -1,7 +1,7 @@
 ## Controlla che tutti gli script si compilino: godot --headless -s tests/compila.gd
 extends SceneTree
 func _init() -> void:
-	var ok := true
+	var ok = true
 	for f in DirAccess.get_files_at("res://scripts"):
 		if f.ends_with(".gd"):
 			var s = load("res://scripts/" + f)

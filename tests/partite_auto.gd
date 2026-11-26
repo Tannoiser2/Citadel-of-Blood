@@ -5,28 +5,28 @@ extends SceneTree
 const D = preload("res://scripts/dati.gd")
 
 func _init() -> void:
-	var n := 60
-	var a := OS.get_cmdline_user_args()
+	var n = 60
+	var a = OS.get_cmdline_user_args()
 	if a.size() > 0:
 		n = int(a[0])
-	var tot := {"vittorie": 0, "sconfitte": 0, "uscite": 0, "turni": 0, "segmenti": 0, "porte_trovate": 0, "uccisi": 0, "combattimenti": 0}
-	var errori := 0
+	var tot = {"vittorie": 0, "sconfitte": 0, "uscite": 0, "turni": 0, "segmenti": 0, "porte_trovate": 0, "uccisi": 0, "combattimenti": 0}
+	var errori = 0
 	for i in n:
-		var m := Motore.new()
-		var rng := RandomNumberGenerator.new()
+		var m = Motore.new()
+		var rng = RandomNumberGenerator.new()
 		rng.seed = 7000 + i
-		var eroi := []
-		var pool := D.EROI.duplicate()
+		var eroi = []
+		var pool = D.EROI.duplicate()
 		for k in 3:
-			var j := rng.randi_range(0, pool.size() - 1)
+			var j = rng.randi_range(0, pool.size() - 1)
 			eroi.append(pool[j]["id"])
 			pool.remove_at(j)
 		m.nuova_partita({"seme": 1000 + i, "eroi": eroi, "iniziati": [
 			{"nome": "Borin", "razza": "nano", "arma2": "pugnale", "esperienza": "pf"},
 			{"nome": "Lithiel", "razza": "elfo", "femmina": true, "arma2": "pugnale", "esperienza": "arma"},
 			{"nome": "Corrado", "razza": "umano", "arma2": "pugnale_lancio", "esperienza": "abilita"}]})
-		var passi := 0
-		var spedizioni := 0
+		var passi = 0
+		var spedizioni = 0
 		while m.s.get("fine", "") == "" and passi < 6000:
 			passi += 1
 			var sc: Dictionary = m.s.get("scelta", {})
@@ -45,8 +45,8 @@ func _init() -> void:
 						m.lancia_fuori(id, x[0], x[1][0])
 						break
 			if passi % 13 == 0:
-				var copia := m.esporta()
-				var q := Motore.new()
+				var copia = m.esporta()
+				var q = Motore.new()
 				if not q.importa(copia):
 					printerr("partita %d: importazione fallita" % i)
 					errori += 1
@@ -77,14 +77,14 @@ func _init() -> void:
 
 ## Giocatore automatico un po' sensato: esplora, combatte, indaga, prova a distruggere la Porta.
 func _scegli(m: Motore, sc: Dictionary, opz: Array, rng: RandomNumberGenerator, passi: int, spedizioni: int) -> Dictionary:
-	var prefer := []
+	var prefer = []
 	match sc["tipo"]:
 		"rotta":
 			prefer = opz.filter(func(x): return x["azione"] == "distruggi")
 			if prefer.is_empty() and m.s["hellgate"]["distrutta"]:
 				prefer = opz.filter(func(x): return x["azione"] == "esci" or x["azione"] == "vai" or x["id"] == "liv|1")
 				if not prefer.is_empty() and rng.randf() < 0.5:
-					var esci := opz.filter(func(x): return x["azione"] == "esci")
+					var esci = opz.filter(func(x): return x["azione"] == "esci")
 					if not esci.is_empty(): prefer = esci
 			if prefer.is_empty():
 				prefer = opz.filter(func(x): return x["azione"] in ["esplora", "livello"])
@@ -109,7 +109,7 @@ func _controlla(m: Motore, i: int) -> void:
 		if int(p["ferite"]) < 0:
 			printerr("partita %d: ferite negative per %s" % [i, p["nome"]])
 			quit(1)
-	var visti := {}
+	var visti = {}
 	for fila in m.s["ordine"]:
 		for u in fila:
 			if u == "": continue

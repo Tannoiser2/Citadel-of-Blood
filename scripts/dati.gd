@@ -303,8 +303,8 @@ const NOMI_MEDAGLIONI := {"neutralizza": "Medaglione Neutralizza Veleno", "stima
 const NOMI_ANELLI := {"resistenza1": "Anello di Resistenza +1", "resistenza2": "Anello di Resistenza +2", "sonno": "Anello del Sonno", "neutralizza": "Anello Neutralizza Veleno", "guarigione": "Anello di Guarigione", "resurrezione": "Anello di Resurrezione"}
 
 static func lettera_tesoro(lettera: String, spostamento: int) -> String:
-	var lettere := "ABCDEFGHIJKL"
-	var i := lettere.find(lettera)
+	var lettere = "ABCDEFGHIJKL"
+	var i = lettere.find(lettera)
 	if i < 0: return lettera
 	return lettere[min(i + spostamento, lettere.length() - 1)]
 

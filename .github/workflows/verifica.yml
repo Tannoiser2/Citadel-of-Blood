@@ -71,8 +71,8 @@ jobs:
           mkdir -p risultati/screen
           for conf in "menu 1440 900" "menu 1024 768" "crea 1440 900" "crea 1024 768" "gioco 1440 900" "gioco 1366 1024" "gioco 1024 768" "gioco 844 390" "combattimento 1440 900" "combattimento 1024 768" "combattimento 1366 1024" "tutorial 1440 900" "tutorial 1024 768" "regole 1440 900" "tabelle 1440 900" "scheda 1024 768" "labirinto 1440 900" "labirinto 1024 768" "fine 1440 900"; do
             set -- $conf
-            PW_AVVIO=$1 PW_LARG=$2 PW_ALT=$3 PW_NOME="$1_$2x$3" timeout 120 xvfb-run -a -s "-screen 0 2000x1400x24" ./godot --path . --rendering-driver opengl3 --resolution $2x$3 --script res://tests/screenshot.gd > "risultati/screen_$1_$2x$3.txt" 2>&1 || echo "screenshot $1 $2x$3 fallito" >> risultati.txt
-            grep -iE "error|script" "risultati/screen_$1_$2x$3.txt" | head -15 >> risultati.txt || true
+            PW_AVVIO=$1 PW_LARG=$2 PW_ALT=$3 PW_NOME="$1_$2x$3" timeout 120 xvfb-run -a -s "-screen 0 2000x1400x24" ./godot --path . --rendering-driver opengl3 --audio-driver Dummy --resolution $2x$3 --script res://tests/screenshot.gd > "risultati/screen_$1_$2x$3.txt" 2>&1 || echo "screenshot $1 $2x$3 fallito" >> risultati.txt
+            grep -iE "SCRIPT ERROR|Parse Error|at: |Invalid" "risultati/screen_$1_$2x$3.txt" | head -15 >> risultati.txt || true
             [ -f /tmp/pw_$1_$2x$3.png ] && python3 -c "from PIL import Image; im=Image.open('/tmp/pw_$1_$2x$3.png').convert('RGB'); im.save('risultati/screen/$1_$2x$3.jpg', quality=82)"
           done
           ls risultati/screen | tee -a risultati.txt
