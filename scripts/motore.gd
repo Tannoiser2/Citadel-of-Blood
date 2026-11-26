@@ -290,6 +290,15 @@ func esplora(d: int, tipo: String) -> void:
 		annota("Nessuna tessera combacia perfettamente: i lati che non combaciano restano chiusi.")
 	if tentativi > 1:
 		annota("Pescate %d tessere prima di trovarne una che combaci." % tentativi)
+	# orientamenti con le stesse uscite valgono come uno solo
+	var uniche = []
+	var viste = {}
+	for rot in rot_valide:
+		var u = ruota_uscite(faccia(scelta_t, lato)["uscite"], rot)
+		if not viste.has(u):
+			viste[u] = true
+			uniche.append(rot)
+	rot_valide = uniche
 	s["pendente"] = {"liv": liv, "xy": chiave(xy), "t": scelta_t, "lato": lato, "porta": tipo == "D"}
 	if rot_valide.size() == 1:
 		_piazza(rot_valide[0])
