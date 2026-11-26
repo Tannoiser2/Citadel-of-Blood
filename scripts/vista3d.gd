@@ -8,7 +8,7 @@ signal cella_toccata(liv: int, xy: Vector2i)
 
 const LATO := 4.0                 # lato di una tessera
 const N := 10                     # celle della pianta
-const H_MURO := 0.95
+const H_MURO := 0.6
 
 var motore: Motore
 var radice: Node3D
@@ -50,19 +50,22 @@ func _ready() -> void:
 func _materiali() -> void:
 	mat_pav = StandardMaterial3D.new()
 	mat_pav.albedo_texture = Risorse.tex("pavimento")
-	mat_pav.albedo_color = Color(0.92, 0.86, 0.8)
+	mat_pav.albedo_color = Color(0.95, 0.9, 0.85)
 	mat_pav.roughness = 0.95
 	mat_pav.uv1_scale = Vector3(1, 1, 1)
 	mat_pav_corr = mat_pav.duplicate()
-	mat_pav_corr.albedo_color = Color(0.72, 0.68, 0.66)
+	mat_pav_corr.albedo_color = Color(0.78, 0.74, 0.72)
 	mat_muro = StandardMaterial3D.new()
 	mat_muro.albedo_texture = Risorse.tex("muro")
-	mat_muro.albedo_color = Color(0.7, 0.62, 0.58)
+	mat_muro.albedo_color = Color(0.78, 0.7, 0.66)
 	mat_muro.roughness = 1.0
 	mat_muro.uv1_triplanar = true
 	mat_muro.uv1_scale = Vector3(0.6, 0.6, 0.6)
 	mat_cima = StandardMaterial3D.new()
-	mat_cima.albedo_color = Color(0.11, 0.08, 0.08)
+	mat_cima.albedo_texture = Risorse.tex("muro")
+	mat_cima.uv1_triplanar = true
+	mat_cima.uv1_scale = Vector3(0.8, 0.8, 0.8)
+	mat_cima.albedo_color = Color(0.42, 0.36, 0.34)
 	mat_cima.roughness = 1.0
 
 func _ambiente() -> void:
@@ -71,19 +74,19 @@ func _ambiente() -> void:
 	env.background_mode = Environment.BG_COLOR
 	env.background_color = Color(0.03, 0.02, 0.02)
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color(0.55, 0.45, 0.42)
-	env.ambient_light_energy = 0.55
+	env.ambient_light_color = Color(0.62, 0.54, 0.5)
+	env.ambient_light_energy = 0.85
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.tonemap_exposure = 0.95
 	env.fog_enabled = true
 	env.fog_light_color = Color(0.08, 0.05, 0.05)
-	env.fog_density = 0.012
+	env.fog_density = 0.006
 	we.environment = env
 	add_child(we)
 	var sole = DirectionalLight3D.new()
 	sole.rotation_degrees = Vector3(-62, 35, 0)
 	sole.light_color = Color(0.85, 0.78, 0.72)
-	sole.light_energy = 0.45
+	sole.light_energy = 0.7
 	sole.shadow_enabled = false
 	add_child(sole)
 	luce_torcia = OmniLight3D.new()

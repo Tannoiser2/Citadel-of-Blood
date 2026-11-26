@@ -67,6 +67,8 @@ func _ready() -> void:
 	dadi.custom_minimum_size = Vector2(420, 100)
 	strato_finestre.add_child(dadi)
 	resized.connect(_layout)
+	get_tree().root.size_changed.connect(_scala_schermo)
+	_scala_schermo()
 	_modo_prova = OS.get_environment("PW_AVVIO")
 	mostra_menu()
 	_layout()
@@ -525,6 +527,9 @@ func _costruisci_gioco() -> void:
 	t.custom_minimum_size.x = 190
 	h.add_child(t)
 	lbl_info = Widget.etichetta("", 15, Risorse.COL_PERGAMENA)
+	lbl_info.autowrap_mode = TextServer.AUTOWRAP_OFF
+	lbl_info.clip_text = true
+	lbl_info.text_overrun_behavior = TextServer.OVERRUN_TRIM_ELLIPSIS
 	lbl_info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	lbl_info.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	h.add_child(lbl_info)
@@ -573,6 +578,19 @@ func _costruisci_gioco() -> void:
 	pan_tutorial = Widget.pannello(Color(0.12, 0.08, 0.03, 0.96), Color(0.95, 0.78, 0.4))
 	pan_tutorial.visible = false
 	strato_gioco.add_child(pan_tutorial)
+
+func _scala_schermo() -> void:
+	## sugli schermi bassi (telefono in orizzontale) l'interfaccia resta leggibile
+	var win = get_window()
+	if win == null: return
+	var reale = DisplayServer.window_get_size()
+	var voluta = Vector2i(1280, 800)
+	if reale.y > 0 and reale.y < 560:
+		voluta = Vector2i(900, 520)
+	elif reale.y > 0 and reale.y < 700:
+		voluta = Vector2i(1100, 680)
+	if win.content_scale_size != voluta:
+		win.content_scale_size = voluta
 
 func _layout() -> void:
 	var W = size.x
@@ -1119,7 +1137,7 @@ func apri_scheda(id: String) -> void:
 	for i in p["armi"].size():
 		var a: Dictionary = p["armi"][i]
 		var ab = int(p["abil"].get(a["tipo"], 0))
-		armi.append("%s%s%s%s" % [D.nome_arma(a["tipo"]), (" magica +%d" % int(a["bonus"])) if int(a.get("bonus", 0)) > 0 else "", (" (abilità +%d)" % ab) if ab > 0 else "", " ← impugnata" if i == int(p.get("arma_att", 0)) else ""])
+		armi.append("%s%s%s%s" % [D.nome_arma(a["tipo"]), (" magica +%d" % int(a["bonus"])) if int(a.get("bonus", 0)) > 0 else "", (" (abilità +%d)" % ab) if ab > 0 else "", " (impugnata)" if i == int(p.get("arma_att", 0)) else ""])
 	v.add_child(_riga_scheda("Armi", "; ".join(armi), ink))
 	var abil = []
 	if int(p.get("disinnesco", 0)) > 0: abil.append("Disinnesco %d" % int(p["disinnesco"]))
@@ -1248,7 +1266,7 @@ func _prova(modo: String) -> void:
 				if sc.is_empty(): break
 				if sc["tipo"] == obiettivo and passi >= minimo: break
 				var opz: Array = sc["opzioni"]
-				var pref = opz.filter(func(o): return o["azione"] in ["esplora", "combatti", "attacca", "arco", "indaga", "ok", "prosegui", "basta", "no", "via", "livello"])
+				var pref = opz.filter(func(o): return o["azione"] in ["esplora", "combatti", "attacca", "arco", "indaga", "ok", "prosegui", "basta", "no", "via"])
 				if pref.is_empty(): pref = opz
 				motore.scegli(pref[rng.randi_range(0, pref.size() - 1)]["id"], {"selezione": {}})
 				motore.eventi.clear()
@@ -1259,7 +1277,7 @@ func _prova(modo: String) -> void:
 			vista.centra_su(int(motore.s["pos"]["liv"]), motore.s["pos"]["xy"])
 			aggiorna()
 			if modo == "labirinto":
-				vista.zoom(2.6)
+				vista.zoom(1.8)
 			if modo == "scheda":
 				apri_scheda(motore.s["ordine_ids"][0])
 			if modo == "fine":
