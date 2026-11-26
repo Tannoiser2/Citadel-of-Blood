@@ -1,0 +1,100 @@
+# Verifica automatica a ogni modifica: compila gli script, controlla le regole, gioca partite
+# automatiche, fa gli screenshot a più risoluzioni (anche iPad) ed esporta la versione web.
+# I risultati finiscono nel ramo "verifica" (cartella risultati/).
+name: Verifica
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: verifica
+  cancel-in-progress: true
+
+jobs:
+  verifica:
+    if: ${{ !contains(github.event.head_commit.message, '[salta verifica]') }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Strumenti
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq xvfb libgl1-mesa-dri libglx-mesa0 mesa-utils > /dev/null
+          pip install -q fonttools pillow
+
+      - name: Scarica Godot 4.7
+        run: |
+          wget -q https://github.com/godotengine/godot/releases/download/4.7-stable/Godot_v4.7-stable_linux.x86_64.zip
+          unzip -q Godot_v4.7-stable_linux.x86_64.zip
+          mv Godot_v4.7-stable_linux.x86_64 godot
+          wget -q https://github.com/godotengine/godot/releases/download/4.7-stable/Godot_v4.7-stable_export_templates.tpz
+          T=~/.local/share/godot/export_templates/4.7.stable
+          mkdir -p $T
+          unzip -q -j Godot_v4.7-stable_export_templates.tpz templates/web_nothreads_release.zip -d $T
+          cp $T/web_nothreads_release.zip $T/web_nothreads_debug.zip
+
+      - name: Glifi dei font
+        run: python3 tools/controlla_glifi.py 2>&1 | tee -a risultati.txt
+
+      - name: Importa e compila
+        run: |
+          mkdir -p risultati
+          ./godot --headless --path . --import > import.txt 2>&1 || true
+          grep -i "error" import.txt | head -40 | tee -a risultati.txt || true
+          ./godot --headless --path . -s res://tests/compila.gd 2>&1 | tee -a risultati.txt
+          ./godot --headless --path . -s res://tests/compila.gd > /dev/null 2>&1
+
+      - name: Regole
+        run: |
+          ./godot --headless --path . -s res://tests/regole.gd 2>&1 | tee -a risultati.txt
+          ./godot --headless --path . -s res://tests/regole.gd > /dev/null 2>&1
+
+      - name: Partite automatiche
+        run: |
+          timeout 900 ./godot --headless --path . -s res://tests/partite_auto.gd -- 80 2>&1 | tail -60 | tee -a risultati.txt
+          timeout 900 ./godot --headless --path . -s res://tests/partite_auto.gd -- 20 > /dev/null 2>&1
+
+      - name: Tutorial completo
+        if: always()
+        run: |
+          if [ -f tests/tutorial.gd ]; then timeout 300 ./godot --headless --path . -s res://tests/tutorial.gd 2>&1 | tail -40 | tee -a risultati.txt; fi
+
+      - name: Screenshot
+        if: always()
+        run: |
+          mkdir -p risultati/screen
+          for conf in "menu 1440 900" "menu 1024 768" "crea 1440 900" "crea 1024 768" "gioco 1440 900" "gioco 1366 1024" "gioco 1024 768" "gioco 844 390" "combattimento 1440 900" "combattimento 1024 768" "combattimento 1366 1024" "tutorial 1440 900" "tutorial 1024 768" "regole 1440 900" "tabelle 1440 900" "scheda 1024 768" "labirinto 1440 900" "labirinto 1024 768" "fine 1440 900"; do
+            set -- $conf
+            PW_AVVIO=$1 PW_LARG=$2 PW_ALT=$3 PW_NOME="$1_$2x$3" timeout 120 xvfb-run -a -s "-screen 0 2000x1400x24" ./godot --path . --rendering-driver opengl3 --resolution $2x$3 --script res://tests/screenshot.gd > "risultati/screen_$1_$2x$3.txt" 2>&1 || echo "screenshot $1 $2x$3 fallito" >> risultati.txt
+            grep -iE "error|script" "risultati/screen_$1_$2x$3.txt" | head -15 >> risultati.txt || true
+            [ -f /tmp/pw_$1_$2x$3.png ] && python3 -c "from PIL import Image; im=Image.open('/tmp/pw_$1_$2x$3.png').convert('RGB'); im.save('risultati/screen/$1_$2x$3.jpg', quality=82)"
+          done
+          ls risultati/screen | tee -a risultati.txt
+
+      - name: Esporta la versione web
+        if: always()
+        run: |
+          mkdir -p build/web
+          ./godot --headless --path . --export-release "Web" build/web/index.html > export.txt 2>&1 || true
+          tail -5 export.txt >> risultati.txt
+          ls -la build/web >> risultati.txt || true
+
+      - name: Salva i risultati nel ramo verifica
+        if: always()
+        run: |
+          cp risultati.txt risultati/ || true
+          cp import.txt risultati/ || true
+          cd risultati
+          git init -q
+          git config user.name "verifica"
+          git config user.email "verifica@users.noreply.github.com"
+          git checkout -q -b verifica
+          git add -A
+          git commit -q -m "Risultati della verifica di ${GITHUB_SHA::7}"
+          git push -q -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" verifica
