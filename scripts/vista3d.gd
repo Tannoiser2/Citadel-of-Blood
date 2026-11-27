@@ -317,6 +317,137 @@ func _cartello(padre: Node3D, nome_tex: String, pos: Vector3, alto: float, bordo
 	base.material_override = mb
 	base.position = pos + Vector3(0, 0.04, 0)
 	padre.add_child(base)
+	var q = MeshInstance3D.new()
+	var bm = BoxMesh.new()
+	bm.size = Vector3(alto * 0.82, alto * 0.82, 0.03)
+	q.mesh = bm
+	var mq = StandardMaterial3D.new()
+	mq.albedo_texture = Risorse.tex(nome_tex)
+	mq.albedo_color = Color(0.95, 0.92, 0.88)
+	mq.roughness = 0.9
+	q.material_override = mq
+	q.position = pos + Vector3(0, 0.08 + alto * 0.41, 0)
+	q.set_meta("cartello", true)
+	padre.add_child(q)
+	var cornice = MeshInstance3D.new()
+	var cm = BoxMesh.new()
+	cm.size = Vector3(alto * 0.9, alto * 0.9, 0.02)
+	cornice.mesh = cm
+	var mc = StandardMaterial3D.new()
+	mc.albedo_color = bordo.darkened(0.4)
+	mc.metallic = 0.4
+	mc.roughness = 0.5
+	cornice.material_override = mc
+	cornice.position = q.position + Vector3(0, 0, -0.02)
+	padre.add_child(cornice)
+
+func _scala(padre: Node3D) -> void:
+	var m = StandardMaterial3D.new()
+	m.albedo_texture = Risorse.tex("muro")
+	m.albedo_color = Color(0.6, 0.55, 0.52)
+	m.uv1_triplanar = true
+	for i in 5:
+		var b = MeshInstance3D.new()
+		var bm = BoxMesh.new()
+		bm.size = Vector3(1.1, 0.12 * (i + 1), 0.24)
+		b.mesh = bm
+		b.material_override = m
+		b.position = Vector3(0.6, 0.06 * (i + 1), 0.6 - i * 0.24)
+		padre.add_child(b)
+	_cartello(padre, "f_scala", Vector3(-0.7, 0, 0.1), 0.85, Color(0.8, 0.7, 0.5))
+
+func _portale(padre: Node3D) -> void:
+	var m = StandardMaterial3D.new()
+	m.albedo_texture = Risorse.tex("muro")
+	m.albedo_color = Color(0.5, 0.4, 0.38)
+	m.uv1_triplanar = true
+	for x in [-0.95, 0.95]:
+		var p = MeshInstance3D.new()
+		var bm = BoxMesh.new()
+		bm.size = Vector3(0.4, 2.0, 0.4)
+		p.mesh = bm
+		p.material_override = m
+		p.position = Vector3(x, 1.0, 1.4)
+		padre.add_child(p)
+	var arch = MeshInstance3D.new()
+	var am = BoxMesh.new()
+	am.size = Vector3(2.4, 0.4, 0.5)
+	arch.mesh = am
+	arch.material_override = m
+	arch.position = Vector3(0, 2.1, 1.4)
+	padre.add_child(arch)
+	_cartello(padre, "gateway", Vector3(0, 0, 1.75), 1.6, Color(0.6, 0.5, 0.3))
+	for x in [-1.3, 1.3]:
+		var fuoco = OmniLight3D.new()
+		fuoco.light_color = Color(1, 0.55, 0.25)
+		fuoco.light_energy = 0.8
+		fuoco.omni_range = 3.0
+		fuoco.position = Vector3(x, 1.2, 1.2)
+		padre.add_child(fuoco)
+
+# --------------------------------------------------------------------------------------------
+# Anteprima di una tessera da orientare
+# --------------------------------------------------------------------------------------------
+func mostra_anteprima(liv: int, k: String, t: int, lato: String, rot: int) -> void:
+	togli_anteprima()
+	var xy = MotoreBase.da_chiave(k)
+	var seg = motore.nuovo_segmento(t, lato, rot, xy)
+	fantasma = _costruisci_tessera(seg)
+	for c in fantasma.get_children():
+		if c is MeshInstance3D:
+			var mm = StandardMaterial3D.new()
+			mm.albedo_color = Color(0.95, 0.75, 0.35, 0.45)
+			mm.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+			mm.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+			c.material_override = mm
+	radice.add_child(fantasma)
+
+func togli_anteprima() -> void:
+	if fantasma != null and is_instance_valid(fantasma):
+		fantasma.queue_free()
+	fantasma = null
+
+## Frecce luminose sulle uscite percorribili
+func mostra_uscite(direzioni: Array) -> void:
+	for c in segnalini.get_children():
+		c.queue_free()
+	if motore == null or motore.s.is_empty(): return
+	var xy = MotoreBase.da_chiave(motore.s["pos"]["xy"])
+	for d in direzioni:
+		var v: Vector2i = Dati.VETTORI[int(d)]
+		var m = MeshInstance3D.new()
+		var pm = PrismMesh.new()
+		pm.size = Vector3(0.7, 0.7, 0.06)
+		m.mesh = pm
+		var mat = StandardMaterial3D.new()
+		mat.albedo_color = Color(1.0, 0.78, 0.35, 0.85)
+		mat.emission_enabled = true
+		mat.emission = Color(0.9, 0.55, 0.15)
+		mat.emission_energy_multiplier = 0.6
+		mat.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		m.material_override = mat
+		var centro = Vector3((xy.x + v.x * 0.5) * LATO, 0.08, (xy.y + v.y * 0.5) * LATO)
+		m.position = centro
+		m.rotation = Vector3(-PI / 2, -atan2(float(v.x), float(-v.y)), 0)
+		segnalini.add_child(m)
+
+# --------------------------------------------------------------------------------------------
+# Pedine in piedi
+# --------------------------------------------------------------------------------------------
+func _pedina(uid: String, nome_tex: String, scala: float, colore: Color, etichetta: String) -> Node3D:
+	var n = Node3D.new()
+	var base = MeshInstance3D.new()
+	var cil = CylinderMesh.new()
+	cil.top_radius = 0.2 * scala
+	cil.bottom_radius = 0.22 * scala
+	cil.height = 0.05
+	base.mesh = cil
+	var mb = StandardMaterial3D.new()
+	mb.albedo_color = colore
+	mb.roughness = 0.6
+	base.material_override = mb
+	base.position.y = 0.025
+	n.add_child(base)
 	# la carta del personaggio è sempre rivolta verso la camera (si legge da ogni angolo)
 	var carta = Node3D.new()
 	carta.name = "Carta"
