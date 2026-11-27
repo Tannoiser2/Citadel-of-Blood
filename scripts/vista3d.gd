@@ -9,6 +9,7 @@ signal cella_toccata(liv: int, xy: Vector2i)
 const LATO := 4.0                 # lato di una tessera
 const N := 10                     # celle della pianta
 const H_MURO := 0.6
+const SPESSORE_MURO := 0.07
 
 var motore: Motore
 var radice: Node3D
@@ -24,11 +25,15 @@ var bersaglio_perno = Vector3.ZERO
 var luce_torcia: OmniLight3D
 var mat_pav: StandardMaterial3D
 var mat_pav_corr: StandardMaterial3D
+var mat_fondo: StandardMaterial3D
 var mat_muro: StandardMaterial3D
 var mat_cima: StandardMaterial3D
 var fantasma: Node3D
 var segnalini: Node3D
 var _seguire = true
+# combattimento nella stanza: bersagli evidenziati, personaggio di turno, posti liberi
+var interazione = {"attivo": false, "evidenziati": {}, "selezionato": "", "attore": "", "posti": [], "in_comb": false}
+var nodo_posti: Node3D
 
 func _ready() -> void:
 	radice = Node3D.new()
@@ -54,6 +59,9 @@ func _materiali() -> void:
 	mat_pav.roughness = 0.95
 	mat_pav.uv1_scale = Vector3(1, 1, 1)
 	mat_pav_corr = mat_pav.duplicate()
+	mat_fondo = StandardMaterial3D.new()
+	mat_fondo.albedo_color = Color(0.06, 0.045, 0.04)
+	mat_fondo.roughness = 1.0
 	mat_pav_corr.albedo_color = Color(0.78, 0.74, 0.72)
 	mat_muro = StandardMaterial3D.new()
 	mat_muro.albedo_texture = Risorse.tex("muro")
@@ -228,28 +236,50 @@ func _costruisci_tessera(seg: Dictionary) -> Node3D:
 	n.position = Vector3(float(seg["x"]) * LATO, 0, float(seg["y"]) * LATO)
 	var g = _griglia(seg)
 	var cella = LATO / N
-	# pavimento
-	var pav = MeshInstance3D.new()
+	if seg.get("tipo", "") != "corridoio" and seg.get("tipo", "") != "portale":
+		g = _allarga_stanza(g)
+	# fondo scuro della tessera (la roccia fuori dalle stanze)
+	var fondo = MeshInstance3D.new()
 	var pm = PlaneMesh.new()
 	pm.size = Vector2(LATO, LATO)
-	pav.mesh = pm
-	pav.material_override = mat_pav if seg.get("tipo", "") != "corridoio" else mat_pav_corr
-	n.add_child(pav)
-	# muri: un unico blocco per tessera
+	fondo.mesh = pm
+	fondo.material_override = mat_fondo
+	fondo.position.y = -0.005
+	n.add_child(fondo)
+	# pavimento: solo le celle calpestabili, con la texture continua su tutta la tessera
+	var sp = SurfaceTool.new()
+	sp.begin(Mesh.PRIMITIVE_TRIANGLES)
+	# muri sottili lungo il bordo delle celle calpestabili
 	var st = SurfaceTool.new()
 	st.begin(Mesh.PRIMITIVE_TRIANGLES)
 	var st2 = SurfaceTool.new()
 	st2.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var usc: String = String(seg.get("uscite", "WWWW"))
+	for d in seg.get("chiuse", []):
+		usc = usc.substr(0, int(d)) + "W" + usc.substr(int(d) + 1)
 	for r in N:
 		for c in N:
-			if String(g[r])[c] == "1": continue
+			if String(g[r])[c] != "1": continue
 			var x0 = -LATO / 2 + c * cella
 			var z0 = -LATO / 2 + r * cella
-			var muro_n = r == 0 or String(g[r - 1])[c] == "1"
-			var muro_s = r == N - 1 or String(g[r + 1])[c] == "1"
-			var muro_o = c == 0 or String(g[r])[c - 1] == "1"
-			var muro_e = c == N - 1 or String(g[r])[c + 1] == "1"
-			_blocco(st, st2, x0, z0, cella, H_MURO, muro_n, muro_s, muro_o, muro_e)
+			_pavimento(sp, x0, z0, cella)
+			# nord, est, sud, ovest
+			var lati = [[r == 0, r > 0 and String(g[r - 1])[c] != "1", 0, c],
+				[c == N - 1, c < N - 1 and String(g[r])[c + 1] != "1", 1, r],
+				[r == N - 1, r < N - 1 and String(g[r + 1])[c] != "1", 2, c],
+				[c == 0, c > 0 and String(g[r])[c - 1] != "1", 3, r]]
+			for L in lati:
+				var muro = L[1]
+				if L[0]:
+					muro = not _apertura(usc[L[2]], int(L[3]))
+				if muro:
+					_muro_sottile(st, st2, x0, z0, cella, int(L[2]), L[0])
+	var pav = MeshInstance3D.new()
+	sp.generate_normals()
+	pav.mesh = sp.commit()
+	if pav.mesh != null and pav.mesh.get_surface_count() > 0:
+		pav.mesh.surface_set_material(0, mat_pav if seg.get("tipo", "") != "corridoio" else mat_pav_corr)
+	n.add_child(pav)
 	var mw = MeshInstance3D.new()
 	st.generate_normals()
 	mw.mesh = st.commit()
@@ -279,6 +309,75 @@ func _costruisci_tessera(seg: Dictionary) -> Node3D:
 	elif el != "":
 		_cartello(n, "f_" + el, Vector3(0, 0, 0), 0.85, Color(0.8, 0.7, 0.5))
 	return n
+
+## Le stanze occupano più spazio della pianta originale: il blocco centrale si allarga di una cella
+## per lato (senza toccare il bordo della tessera), così c'è posto per il combattimento.
+func _allarga_stanza(g: Array) -> Array:
+	var nucleo = {}
+	for r in range(1, N - 1):
+		for c in range(1, N - 1):
+			var pieno = true
+			for dr in [-1, 0, 1]:
+				for dc in [-1, 0, 1]:
+					if String(g[r + dr])[c + dc] != "1": pieno = false
+			if pieno: nucleo[Vector2i(c, r)] = true
+	if nucleo.is_empty(): return g
+	var out = []
+	for r in N:
+		var riga = ""
+		for c in N:
+			var ch: String = String(g[r])[c]
+			if ch != "1" and r >= 1 and r <= N - 2 and c >= 1 and c <= N - 2:
+				for dr in [-2, -1, 0, 1, 2]:
+					for dc in [-2, -1, 0, 1, 2]:
+						if nucleo.has(Vector2i(c + dc, r + dr)): ch = "1"
+			riga += ch
+		out.append(riga)
+	return out
+
+## Sul bordo della tessera si passa solo dove c'è un'uscita: porta (celle 4-5) o corridoio (3-6)
+func _apertura(tipo: String, i: int) -> bool:
+	if tipo == "*": tipo = "C"
+	if tipo == "D": return i >= 4 and i <= 5
+	if tipo == "C": return i >= 3 and i <= 6
+	return false
+
+func _pavimento(st: SurfaceTool, x: float, z: float, s: float) -> void:
+	var u0 = (x + LATO / 2) / LATO
+	var v0 = (z + LATO / 2) / LATO
+	var du = s / LATO
+	var a = [Vector3(x, 0, z), Vector3(x + s, 0, z), Vector3(x + s, 0, z + s), Vector3(x, 0, z + s)]
+	var uv = [Vector2(u0, v0), Vector2(u0 + du, v0), Vector2(u0 + du, v0 + du), Vector2(u0, v0 + du)]
+	for k in [0, 1, 2, 0, 2, 3]:
+		st.set_normal(Vector3.UP)
+		st.set_uv(uv[k])
+		st.add_vertex(a[k])
+
+## Un tratto di muro sottile sul lato d (0 N, 1 E, 2 S, 3 O) di una cella, costruito verso l'esterno
+func _muro_sottile(st: SurfaceTool, cima: SurfaceTool, x: float, z: float, s: float, d: int, interno: bool = false) -> void:
+	var t = SPESSORE_MURO
+	var x0 = x - t
+	var x1 = x + s + t
+	var z0 = z - t
+	var z1 = z + s + t
+	match d:
+		0: z1 = z; z0 = z - t
+		2: z0 = z + s; z1 = z + s + t
+		1: x0 = x + s; x1 = x + s + t
+		3: x1 = x; x0 = x - t
+	if interno:
+		# sul bordo della tessera il muro sta dentro la cella, per non invadere la tessera vicina
+		match d:
+			0: z0 = z; z1 = z + t
+			2: z0 = z + s - t; z1 = z + s
+			1: x0 = x + s - t; x1 = x + s
+			3: x0 = x; x1 = x + t
+	var h = H_MURO
+	_quad(cima, Vector3(x0, h, z0), Vector3(x1, h, z0), Vector3(x1, h, z1), Vector3(x0, h, z1), 0.3)
+	_quad(st, Vector3(x1, h, z0), Vector3(x0, h, z0), Vector3(x0, 0, z0), Vector3(x1, 0, z0), 0.5)
+	_quad(st, Vector3(x0, h, z1), Vector3(x1, h, z1), Vector3(x1, 0, z1), Vector3(x0, 0, z1), 0.5)
+	_quad(st, Vector3(x0, h, z0), Vector3(x0, h, z1), Vector3(x0, 0, z1), Vector3(x0, 0, z0), 0.5)
+	_quad(st, Vector3(x1, h, z1), Vector3(x1, h, z0), Vector3(x1, 0, z0), Vector3(x1, 0, z1), 0.5)
 
 func _quad(st: SurfaceTool, a: Vector3, b: Vector3, c: Vector3, d: Vector3, uv_scala: float) -> void:
 	st.set_uv(Vector2(0, 0) * uv_scala); st.add_vertex(a)
@@ -441,6 +540,19 @@ func _pedina(uid: String, nome_tex: String, scala: float, colore: Color, etichet
 	base.material_override = mb
 	base.position.y = 0.025
 	n.add_child(base)
+	var an = MeshInstance3D.new()
+	an.name = "Anello"
+	var tor = TorusMesh.new()
+	tor.inner_radius = 0.27 * scala
+	tor.outer_radius = 0.33 * scala
+	an.mesh = tor
+	var ma = StandardMaterial3D.new()
+	ma.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	ma.emission_enabled = true
+	an.material_override = ma
+	an.position.y = 0.03
+	an.visible = false
+	n.add_child(an)
 	# la carta del personaggio sta in piedi, ferma sul tavolo (non segue la camera)
 	var carta = Node3D.new()
 	carta.name = "Carta"
@@ -618,6 +730,84 @@ func aggiorna_pedine() -> void:
 			pedine[k].queue_free()
 			pedine.erase(k)
 	luce_torcia.visible = true
+	# posti liberi dove spostare il personaggio scelto (riorganizzazione / ordine di marcia)
+	if nodo_posti == null:
+		nodo_posti = Node3D.new()
+		radice.add_child(nodo_posti)
+	for ch in nodo_posti.get_children(): ch.queue_free()
+	for p in interazione["posti"]:
+		var pp = posto_3d(p.x, p.y)
+		var disco = MeshInstance3D.new()
+		var cm = CylinderMesh.new()
+		cm.top_radius = 0.24
+		cm.bottom_radius = 0.24
+		cm.height = 0.02
+		disco.mesh = cm
+		var md = StandardMaterial3D.new()
+		md.albedo_color = Color(1.0, 0.8, 0.3, 0.55)
+		md.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+		md.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+		disco.material_override = md
+		disco.position = pp + Vector3(0, 0.02, 0)
+		nodo_posti.add_child(disco)
+		var lq = Label3D.new()
+		lq.text = "Qui"
+		lq.font = Risorse.font("Testo")
+		lq.font_size = 48
+		lq.pixel_size = 0.004
+		lq.outline_size = 10
+		lq.modulate = Color(1, 0.9, 0.6)
+		lq.rotation.x = -PI / 2
+		lq.position = pp + Vector3(0, 0.04, 0)
+		nodo_posti.add_child(lq)
+
+## Posizione sul tavolo di un posto dell'ordine di marcia del gruppo (colonna, fila)
+func posto_3d(col: int, riga: int) -> Vector3:
+	var xy = MotoreBase.da_chiave(motore.s["pos"]["xy"])
+	var centro = Vector3(xy.x * LATO, 0, xy.y * LATO)
+	var p = centro + Vector3((col - 1) * 0.62, 0, 0.35 + riga * 0.55)
+	if not interazione["in_comb"]: p.z -= 0.1
+	return p
+
+## Pedina sotto un punto dello schermo (la più vicina alla camera), "" se nessuna
+func pedina_sotto(pos: Vector2) -> String:
+	var migliore = ""
+	var dist_min = INF
+	for uid in pedine:
+		if String(uid).begins_with("fermo"): continue
+		var n: Node3D = pedine[uid]
+		if not is_instance_valid(n): continue
+		var sc = float(n.get_meta("scala", 1.0))
+		var base: Vector3 = n.get_meta("pos", n.position)
+		if cam.is_position_behind(base): continue
+		var p0 = cam.unproject_position(base)
+		var p1 = cam.unproject_position(base + Vector3(0, 0.7 * sc, 0))
+		var raggio = cam.unproject_position(base).distance_to(cam.unproject_position(base + cam.global_transform.basis.x * 0.28 * sc))
+		var top = minf(p0.y, p1.y) - 4
+		var bot = maxf(p0.y, p1.y) + raggio * 0.5
+		var cx = (p0.x + p1.x) / 2.0
+		if pos.y >= top and pos.y <= bot and absf(pos.x - cx) <= raggio + 4:
+			var d = cam.global_position.distance_to(base)
+			if d < dist_min:
+				dist_min = d
+				migliore = uid
+	return migliore
+
+## Posto libero sotto un punto dello schermo, (-1,-1) se nessuno
+func posto_sotto(pos: Vector2) -> Vector2i:
+	for p in interazione["posti"]:
+		var c = posto_3d(p.x, p.y)
+		var sp = cam.unproject_position(c)
+		var r = sp.distance_to(cam.unproject_position(c + cam.global_transform.basis.x * 0.28))
+		if pos.distance_to(sp) <= r + 6: return p
+	return Vector2i(-1, -1)
+
+## Avvicina la camera alla stanza del combattimento
+func inquadra_stanza() -> void:
+	centra_su(int(motore.s["pos"]["liv"]), motore.s["pos"]["xy"])
+	dist = 7.0
+	pitch = -0.95
+	_aggiorna_camera()
 
 func _metti_pedina(uid: String, nome_tex: String, pos: Vector3, scala: float, colore: Color, etichetta: String, rot_y: float, vivi: Dictionary) -> void:
 	vivi[uid] = true
@@ -632,6 +822,30 @@ func _metti_pedina(uid: String, nome_tex: String, pos: Vector3, scala: float, co
 		radice.add_child(n)
 		pedine[uid] = n
 	n.rotation.y = rot_y
+	n.set_meta("scala", scala)
+	n.set_meta("pos", pos)
+	# nome (e Punti Ferita durante combattimenti e incontri) su entrambe le facce
+	var testo = etichetta
+	if interazione["attivo"] and uid != "hellgate" and not uid.begins_with("fermo"):
+		var u = motore.unita(uid)
+		if not u.is_empty():
+			testo = "%s  %d/%d" % [etichetta, motore.pf_residui(u), int(u.get("pf_max", 0)) + int(u.get("pf_armatura", 0))]
+	var carta = n.get_node_or_null("Carta")
+	if carta:
+		for ch in carta.get_children():
+			if ch is Label3D: ch.text = testo
+	# anello sul tavolo: dorato = bersaglio valido, azzurro = di turno, bianco = selezionato
+	var an: MeshInstance3D = n.get_node_or_null("Anello")
+	if an:
+		var col_an = Color(0, 0, 0, 0)
+		if interazione["attivo"]:
+			if interazione["selezionato"] == uid: col_an = Color(1, 1, 1)
+			elif interazione["evidenziati"].has(uid): col_an = Color(1.0, 0.78, 0.2)
+			elif interazione["attore"] == uid: col_an = Color(0.35, 0.8, 1.0)
+		an.visible = col_an.a > 0
+		if an.visible:
+			(an.material_override as StandardMaterial3D).albedo_color = col_an
+			(an.material_override as StandardMaterial3D).emission = col_an * 0.6
 
 func colpo(uid: String) -> void:
 	## piccolo sobbalzo della pedina colpita

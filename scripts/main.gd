@@ -24,6 +24,8 @@ var box_azioni: VBoxContainer
 var tavola: Tavola
 var dadi: Dadi
 var crt: TabellaCRT
+var lbl_stanza: Label
+var _stanza_inquadrata := false
 var _coda_crt: Array = []
 var _t_crt := 0.0
 var pan_diario: PanelContainer
@@ -170,9 +172,19 @@ func _misura_pinza() -> void:
 ## Tocco sul labirinto: se è una tessera vicina, muove il gruppo
 func _tocco_su(pos: Vector2) -> void:
 	if motore.s.is_empty() or tutorial_blocca(): return
+	var p = pos * (Vector2(sv.size) / svc.size) if svc.size.x > 0 else pos
+	# combattimento, incontro o ordine di marcia: si tocca direttamente pedine e posti nella stanza
+	if vista.interazione["attivo"]:
+		var uid = vista.pedina_sotto(p)
+		if uid != "":
+			_carta_premuta(uid)
+			return
+		var posto = vista.posto_sotto(p)
+		if posto.x >= 0:
+			_posto_premuto(posto.x, posto.y)
+			return
 	var sc: Dictionary = motore.s.get("scelta", {})
 	if sc.get("tipo", "") != "rotta": return
-	var p = pos * (Vector2(sv.size) / svc.size) if svc.size.x > 0 else pos
 	var cella = vista.cella_sotto(p)
 	var xy = MotoreBase.da_chiave(motore.s["pos"]["xy"])
 	var d = Dati.VETTORI.find(cella - xy)
@@ -580,6 +592,12 @@ func _costruisci_gioco() -> void:
 	vd.add_child(txt_diario)
 	crt = TabellaCRT.new()
 	strato_gioco.add_child(crt)
+	lbl_stanza = Widget.etichetta("", 17, Risorse.COL_ORO, "grassetto")
+	lbl_stanza.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl_stanza.add_theme_stylebox_override("normal", Risorse.box(Color(0.08, 0.04, 0.03, 0.85), Risorse.COL_ORO, 1, 6, 6))
+	lbl_stanza.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lbl_stanza.visible = false
+	strato_gioco.add_child(lbl_stanza)
 	pan_tutorial = Widget.pannello(Color(0.12, 0.08, 0.03, 0.96), Color(0.95, 0.78, 0.4))
 	pan_tutorial.visible = false
 	strato_gioco.add_child(pan_tutorial)
@@ -611,16 +629,8 @@ func _layout() -> void:
 	if piccolo: ws = 170
 	var wd = clampf(W * 0.31, 300, 440)
 	if piccolo: wd = clampf(W * 0.36, 260, 320)
-	# in combattimento (o incontro, o ordine di marcia) la colonna sinistra diventa la tavola:
-	# mostri e gruppo schierati per file, senza coprire il labirinto al centro
-	var tav_on = tavola != null and tavola.visible
-	if tav_on:
-		ws = clampf(W * 0.27, 250, 380)
-		if piccolo: ws = clampf(W * 0.3, 240, 280)
 	col_sinistra.position = Vector2(6, hb + 6)
 	col_sinistra.size = Vector2(ws, H - hb - 12)
-	if col_sinistra.get_child_count() > 0:
-		col_sinistra.get_child(0).visible = not tav_on
 	pan_azioni.position = Vector2(W - wd - 6, hb + 6)
 	pan_azioni.size = Vector2(wd, H - hb - 12)
 	var cx = ws + 16
@@ -633,10 +643,13 @@ func _layout() -> void:
 		var th = clampf(H * 0.36, 170, 300)
 		pan_tutorial.position = Vector2(cx, H - th - 6)
 		pan_tutorial.size = Vector2(cw, th)
-	var wt = minf(cw - 16, 560.0)
+	lbl_stanza.position = Vector2(cx + 8, hb + 8)
+	lbl_stanza.size = Vector2(cw - 16, 34)
+	# la tabella del combattimento compare in basso nel pannello di destra, senza coprire la stanza
+	var wt = wd - 16
 	crt.size = Vector2(wt, wt * 0.66)
-	crt.position = Vector2(cx + (cw - wt) / 2, hb + 116)
-	dadi.position = Vector2((W - 420) / 2, hb + 10)
+	crt.position = Vector2(W - wd - 6 + 8, H - wt * 0.66 - 16)
+	dadi.position = Vector2(cx + (cw - 420) / 2, hb + 48)
 	dadi.size = Vector2(420, 100)
 	for b in barra_alta.get_child(0).get_children():
 		if b is Button:
@@ -811,7 +824,16 @@ func _aggiorna_tavola() -> void:
 		tavola.titolo = "Combattimento"
 	else:
 		tavola.titolo = "Incontro"
-	tavola.aggiorna()
+	# il combattimento si gioca direttamente nella stanza 3D: la tavola resta solo come stato
+	tavola.visible = false
+	vista.interazione = {"attivo": mostra, "evidenziati": tavola.evidenziati, "selezionato": tavola.selezionato,
+		"attore": tavola.attore, "posti": tavola.posti_validi, "in_comb": not c.is_empty() and c.get("esito", "") == ""}
+	vista.aggiorna_pedine()
+	lbl_stanza.text = tavola.titolo
+	lbl_stanza.visible = mostra and not pan_diario.visible
+	if mostra and not _stanza_inquadrata:
+		vista.inquadra_stanza()
+	_stanza_inquadrata = mostra
 
 func _aggiorna_frecce() -> void:
 	var sc: Dictionary = motore.s.get("scelta", {})
@@ -928,7 +950,7 @@ func _azioni_combattimento(sc: Dictionary, dim: int) -> void:
 	var pos = motore.fila_di(motore.ordine_gruppo(), sc["chi"])
 	box_azioni.add_child(Widget.etichetta("Fila %d · arma: %s" % [pos.y + 1, D.nome_arma(motore.arma(u)["tipo"]) if sc["chi"].begins_with("p:") else "naturale"], dim - 1, Color(0.85, 0.8, 0.7)))
 	if modalita_bersaglio != "":
-		box_azioni.add_child(Widget.etichetta("Scegli il bersaglio sulla tavola (riquadri dorati) o qui:", dim - 1))
+		box_azioni.add_child(Widget.etichetta("Tocca il bersaglio nella stanza (anello dorato) o sceglilo qui:", dim - 1))
 		for o in sc["opzioni"]:
 			if o["azione"] == modalita_bersaglio:
 				var bt = Widget.bottone(o["testo"], func(): _scegli(o["id"]), dim)
