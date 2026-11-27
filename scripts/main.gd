@@ -606,14 +606,22 @@ func _layout() -> void:
 	if piccolo: ws = 170
 	var wd = clampf(W * 0.31, 300, 440)
 	if piccolo: wd = clampf(W * 0.36, 260, 320)
+	# in combattimento (o incontro, o ordine di marcia) la colonna sinistra diventa la tavola:
+	# mostri e gruppo schierati per file, senza coprire il labirinto al centro
+	var tav_on = tavola != null and tavola.visible
+	if tav_on:
+		ws = clampf(W * 0.27, 250, 380)
+		if piccolo: ws = clampf(W * 0.3, 240, 280)
 	col_sinistra.position = Vector2(6, hb + 6)
 	col_sinistra.size = Vector2(ws, H - hb - 12)
+	if col_sinistra.get_child_count() > 0:
+		col_sinistra.get_child(0).visible = not tav_on
 	pan_azioni.position = Vector2(W - wd - 6, hb + 6)
 	pan_azioni.size = Vector2(wd, H - hb - 12)
 	var cx = ws + 16
 	var cw = W - ws - wd - 32
-	tavola.position = Vector2(cx, hb + 6)
-	tavola.size = Vector2(cw, H - hb - 12)
+	tavola.position = Vector2(14, hb + 12)
+	tavola.size = Vector2(ws - 16, H - hb - 24)
 	pan_diario.position = Vector2(cx, hb + 6)
 	pan_diario.size = Vector2(cw, H - hb - 12)
 	if tutorial != null and pan_tutorial.visible:

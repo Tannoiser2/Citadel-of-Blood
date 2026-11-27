@@ -53,36 +53,37 @@ func aggiorna() -> void:
 	var tot = righe_m + righe_g
 	if tot == 0: return
 	var spazio = 26.0
-	var h_carta = minf((size.y - spazio - 30) / float(tot) - 6, 150)
-	var w_carta = minf(h_carta * 0.78, (size.x - 40) / 3.0 - 10)
+	var h_carta = minf((size.y - spazio - 56) / float(tot) - 6, 150)
+	var w_carta = minf(h_carta * 0.78, (size.x - 8) / 3.0 - 6)
 	h_carta = w_carta / 0.78
-	var x0 = (size.x - (w_carta * 3 + 20)) / 2
+	var x0 = (size.x - (w_carta * 3 + 12)) / 2
 	var y = 4.0
 	if titolo != "":
-		var t = Widget.etichetta(titolo, 17, Risorse.COL_ORO, "grassetto")
+		var t = Widget.etichetta(titolo, 15, Risorse.COL_ORO, "grassetto")
 		t.position = Vector2(0, 0)
-		t.size = Vector2(size.x, 24)
+		t.size = Vector2(size.x, 44)
 		t.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		t.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 		add_child(t)
-		y += 26
+		y += 48
 	# mostri: dall'ultima fila alla prima (la prima è la più vicina al gruppo)
 	for r in range(righe_m - 1, -1, -1):
 		for col in 3:
 			var uid: String = mostri[r][col]
 			if uid == "": continue
-			_carta(uid, Rect2(x0 + col * (w_carta + 10), y, w_carta, h_carta), true)
+			_carta(uid, Rect2(x0 + col * (w_carta + 6), y, w_carta, h_carta), true)
 		y += h_carta + 6
 	var linea = ColorRect.new()
 	linea.color = Color(0.7, 0.15, 0.1, 0.7)
-	linea.position = Vector2(x0 - 10, y + spazio / 2 - 1)
-	linea.size = Vector2(w_carta * 3 + 40, 2)
+	linea.position = Vector2(x0, y + spazio / 2 - 1)
+	linea.size = Vector2(w_carta * 3 + 12, 2)
 	linea.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(linea)
 	y += spazio
 	for r in righe_g:
 		for col in 3:
 			var uid2: String = gruppo[r][col] if r < gruppo.size() else ""
-			var rett = Rect2(x0 + col * (w_carta + 10), y, w_carta, h_carta)
+			var rett = Rect2(x0 + col * (w_carta + 6), y, w_carta, h_carta)
 			if uid2 == "":
 				if Vector2i(col, r) in posti_validi:
 					_posto(rett, col, r)
