@@ -829,7 +829,7 @@ func _metti_pedina(uid: String, nome_tex: String, pos: Vector3, scala: float, co
 	if interazione["attivo"] and uid != "hellgate" and not uid.begins_with("fermo"):
 		var u = motore.unita(uid)
 		if not u.is_empty():
-			testo = "%s  %d/%d" % [etichetta, motore.pf_residui(u), int(u.get("pf_max", 0)) + int(u.get("pf_armatura", 0))]
+			testo = "%s\n%d/%d PF" % [etichetta, motore.pf_residui(u), int(u.get("pf_max", 0)) + int(u.get("pf_armatura", 0))]
 	var carta = n.get_node_or_null("Carta")
 	if carta:
 		for ch in carta.get_children():
