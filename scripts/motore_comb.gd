@@ -525,7 +525,8 @@ func attacco(att: String, bers: String, tipo_forzato: String) -> void:
 	mostra_dadi([t1], "%s attacca %s" % [a["nome"], b["nome"]])
 	annota("%s attacca %s (%s): tira %d %+d = %d → %s." % [a["nome"], b["nome"], descr, t1, mod, tot,
 		"mancato" if n == 0 else ("%d ferit%s" % [n, "a" if n == 1 else "e"])], "dado")
-	evento({"tipo": "attacco", "da": att, "a": bers, "ferite": n})
+	evento({"tipo": "attacco", "da": att, "a": bers, "ferite": n, "col": col, "riga": D.riga_crt(tot),
+		"dado": t1, "mod": mod, "tot": tot, "testo": "%s attacca %s" % [a["nome"], b["nome"]]})
 	if n > 0:
 		danneggia(bers, n, a["nome"], false)
 

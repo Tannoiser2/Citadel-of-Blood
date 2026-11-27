@@ -446,44 +446,120 @@ func _pedina(uid: String, nome_tex: String, scala: float, colore: Color, etichet
 	carta.name = "Carta"
 	carta.position.y = 0.05
 	n.add_child(carta)
-	var q = MeshInstance3D.new()
-	var bm = QuadMesh.new()
-	bm.size = Vector2(0.5 * scala, 0.6 * scala)
-	q.mesh = bm
+	# standee di cartoncino sagomato ad arco, con spessore: il ritratto si vede da entrambe le facce
+	var w = 0.5 * scala
+	var hh = 0.66 * scala
+	var sp = 0.04
+	var bordo = 0.03 * scala
+	var est = _profilo_arco(w, hh, 0.0)
+	var inn = _profilo_arco(w - 2.0 * bordo, hh - bordo, bordo)
 	var mq = StandardMaterial3D.new()
 	mq.albedo_texture = Risorse.tex(nome_tex)
 	mq.albedo_color = Color(0.86, 0.84, 0.82)
 	mq.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mq.cull_mode = BaseMaterial3D.CULL_DISABLED
-	q.material_override = mq
-	q.position = Vector3(0, 0.3 * scala + 0.03, 0.004)
-	carta.add_child(q)
-	var cor = MeshInstance3D.new()
-	var cb = QuadMesh.new()
-	cb.size = Vector2(0.56 * scala, 0.66 * scala)
-	cor.mesh = cb
 	var mc = StandardMaterial3D.new()
 	mc.albedo_color = colore
-	mc.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
-	mc.cull_mode = BaseMaterial3D.CULL_DISABLED
-	cor.material_override = mc
-	cor.position = Vector3(0, 0.3 * scala + 0.03, 0.0)
-	carta.add_child(cor)
+	mc.roughness = 0.7
+	var mcart = StandardMaterial3D.new()
+	mcart.albedo_color = Color(0.62, 0.52, 0.38)
+	mcart.roughness = 0.95
+	for m in [mq, mc, mcart]:
+		m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	var facce = MeshInstance3D.new()
+	facce.mesh = _mesh_facce(inn, hh, sp)
+	facce.material_override = mq
+	carta.add_child(facce)
+	var cornice = MeshInstance3D.new()
+	cornice.mesh = _mesh_cornice(est, inn, sp)
+	cornice.material_override = mc
+	carta.add_child(cornice)
+	var fianco = MeshInstance3D.new()
+	fianco.mesh = _mesh_fianco(est, sp)
+	fianco.material_override = mcart
+	carta.add_child(fianco)
 	if etichetta != "":
-		var l = Label3D.new()
-		l.text = etichetta
-		l.font = Risorse.font("Testo")
-		l.font_size = 40
-		l.pixel_size = 0.0035
-		l.outline_size = 10
-		l.modulate = Color(1, 0.93, 0.8)
-		l.outline_modulate = Color(0, 0, 0, 0.9)
-		l.position = Vector3(0, 0.03 + 0.07 * scala, 0.01)
-		l.no_depth_test = true
-		l.render_priority = 2
-		carta.add_child(l)
+		for lato in [1.0, -1.0]:
+			var l = Label3D.new()
+			l.text = etichetta
+			l.font = Risorse.font("Testo")
+			l.font_size = 40
+			l.pixel_size = 0.0035
+			l.outline_size = 10
+			l.modulate = Color(1, 0.93, 0.8)
+			l.outline_modulate = Color(0, 0, 0, 0.9)
+			l.double_sided = false
+			l.position = Vector3(0, bordo + 0.07 * scala, lato * (sp / 2.0 + 0.004))
+			if lato < 0: l.rotation.y = PI
+			l.render_priority = 2
+			carta.add_child(l)
 	n.set_meta("uid", uid)
 	return n
+
+## contorno dello standee: rettangolo con la cima ad arco (punti in senso antiorario, base in basso)
+func _profilo_arco(w: float, h: float, y0: float) -> Array:
+	var r = w / 2.0
+	var pts = [Vector2(-r, y0), Vector2(r, y0)]
+	var seg = 14
+	for i in seg + 1:
+		var ang = PI * float(i) / float(seg)
+		pts.append(Vector2(cos(ang) * r, h - r + sin(ang) * r))
+	return pts
+
+func _uv_ritratto(p: Vector2, h: float, dietro: bool) -> Vector2:
+	# il ritratto copre tutta l'altezza; dietro è specchiato perché si legga dritto
+	var u = 0.5 + p.x / h
+	if dietro: u = 0.5 - p.x / h
+	return Vector2(u, 1.0 - p.y / h)
+
+func _mesh_facce(pts: Array, h: float, sp: float) -> ArrayMesh:
+	var st = SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var c = Vector2.ZERO
+	for p in pts: c += p
+	c /= float(pts.size())
+	for lato in [1.0, -1.0]:
+		var z = lato * sp / 2.0
+		var dietro = lato < 0
+		for i in pts.size():
+			var p1: Vector2 = pts[i]
+			var p2: Vector2 = pts[(i + 1) % pts.size()]
+			var tri = [c, p1, p2] if not dietro else [c, p2, p1]
+			for q in tri:
+				st.set_normal(Vector3(0, 0, lato))
+				st.set_uv(_uv_ritratto(q, h, dietro))
+				st.add_vertex(Vector3(q.x, q.y, z))
+	return st.commit()
+
+func _mesh_cornice(est: Array, inn: Array, sp: float) -> ArrayMesh:
+	var st = SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for lato in [1.0, -1.0]:
+		var z = lato * (sp / 2.0 + 0.0005)
+		for i in est.size():
+			var j = (i + 1) % est.size()
+			var a: Vector2 = est[i]
+			var b: Vector2 = est[j]
+			var c: Vector2 = inn[j]
+			var d: Vector2 = inn[i]
+			var tri = [a, b, c, a, c, d] if lato > 0 else [a, c, b, a, d, c]
+			for q in tri:
+				st.set_normal(Vector3(0, 0, lato))
+				st.add_vertex(Vector3(q.x, q.y, z))
+	return st.commit()
+
+func _mesh_fianco(pts: Array, sp: float) -> ArrayMesh:
+	var st = SurfaceTool.new()
+	st.begin(Mesh.PRIMITIVE_TRIANGLES)
+	for i in pts.size():
+		var a: Vector2 = pts[i]
+		var b: Vector2 = pts[(i + 1) % pts.size()]
+		var d = (b - a)
+		var nrm = Vector3(d.y, -d.x, 0).normalized()
+		var v = [Vector3(a.x, a.y, sp / 2.0), Vector3(b.x, b.y, sp / 2.0), Vector3(b.x, b.y, -sp / 2.0), Vector3(a.x, a.y, -sp / 2.0)]
+		for k in [0, 2, 1, 0, 3, 2]:
+			st.set_normal(nrm)
+			st.add_vertex(v[k])
+	return st.commit()
 
 func aggiorna_pedine() -> void:
 	if motore == null or motore.s.is_empty(): return

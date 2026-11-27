@@ -23,6 +23,9 @@ var pan_azioni: PanelContainer
 var box_azioni: VBoxContainer
 var tavola: Tavola
 var dadi: Dadi
+var crt: TabellaCRT
+var _coda_crt: Array = []
+var _t_crt := 0.0
 var pan_diario: PanelContainer
 var txt_diario: RichTextLabel
 var pan_tutorial: PanelContainer
@@ -575,6 +578,8 @@ func _costruisci_gioco() -> void:
 	txt_diario.add_theme_font_size_override("normal_font_size", 15)
 	txt_diario.add_theme_font_size_override("bold_font_size", 15)
 	vd.add_child(txt_diario)
+	crt = TabellaCRT.new()
+	strato_gioco.add_child(crt)
 	pan_tutorial = Widget.pannello(Color(0.12, 0.08, 0.03, 0.96), Color(0.95, 0.78, 0.4))
 	pan_tutorial.visible = false
 	strato_gioco.add_child(pan_tutorial)
@@ -628,6 +633,9 @@ func _layout() -> void:
 		var th = clampf(H * 0.36, 170, 300)
 		pan_tutorial.position = Vector2(cx, H - th - 6)
 		pan_tutorial.size = Vector2(cw, th)
+	var wt = minf(cw - 16, 560.0)
+	crt.size = Vector2(wt, wt * 0.66)
+	crt.position = Vector2(cx + (cw - wt) / 2, hb + 116)
 	dadi.position = Vector2((W - 420) / 2, hb + 10)
 	dadi.size = Vector2(420, 100)
 	for b in barra_alta.get_child(0).get_children():
@@ -659,6 +667,8 @@ func _consuma_eventi() -> void:
 		match e["tipo"]:
 			"dadi":
 				_coda_dadi.append(e)
+			"attacco":
+				_coda_crt.append(e)
 			"log":
 				_recenti.append({"t": e["testo"], "k": e["k"]})
 				if _recenti.size() > 40: _recenti.remove_at(0)
@@ -677,6 +687,14 @@ func _consuma_eventi() -> void:
 		_anteprima = {}
 
 func _process(delta: float) -> void:
+	_t_crt -= delta
+	if _t_crt <= 0 and not _coda_crt.is_empty():
+		# la tabella mostra un attacco alla volta: riga del totale × colonna dell'arma
+		while _coda_crt.size() > 6: _coda_crt.remove_at(0)
+		var ec = _coda_crt.pop_front()
+		var dur = 1.8 if not _coda_crt.is_empty() else 4.0
+		crt.mostra(ec, dur)
+		_t_crt = dur - 0.2 if not _coda_crt.is_empty() else 1.6
 	_t_dadi -= delta
 	if _t_dadi <= 0 and not _coda_dadi.is_empty():
 		# mostra gli ultimi tiri, uno dopo l'altro
@@ -1286,6 +1304,9 @@ func _prova(modo: String) -> void:
 			aggiorna()
 			if modo == "labirinto":
 				vista.zoom(1.8)
+			if modo == "combattimento":
+				_coda_crt.clear()
+				crt.mostra({"testo": "Gislan attacca Idra", "col": "ascia", "riga": D.riga_crt(9), "dado": 5, "mod": 4, "tot": 9, "ferite": 1}, 99.0)
 			if modo == "scheda":
 				apri_scheda(motore.s["ordine_ids"][0])
 			if modo == "fine":
