@@ -1,0 +1,253 @@
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Started Project initialization (5 steps)[39m[0m
+[   0% ] [90m[1mfirst_scan_filesystem[22m | Scanning file structure...[39m[0m
+[  16% ] [90m[1mfirst_scan_filesystem[22m | Loading global class names...[39m[0m
+[  33% ] [90m[1mfirst_scan_filesystem[22m | Verifying GDExtensions...[39m[0m
+[  50% ] [90m[1mfirst_scan_filesystem[22m | Creating autoload scripts...[39m[0m
+[  66% ] [90m[1mfirst_scan_filesystem[22m | Initializing plugins...[39m[0m
+[  83% ] [90m[1mfirst_scan_filesystem[22m | Starting file scan...[39m[0m
+[92m[ DONE ][39m [1mfirst_scan_filesystem[22m
+[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | Started Registering global classes... (18 steps)[39m[0m
+[   0% ] [90m[1mupdate_scripts_classes[22m | Dadi[39m[0m
+[   5% ] [90m[1mupdate_scripts_classes[22m | Dati[39m[0m
+[  10% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  15% ] [90m[1mupdate_scripts_classes[22m | Motore[39m[0m
+[  21% ] [90m[1mupdate_scripts_classes[22m | MotoreBase[39m[0m
+[  26% ] [90m[1mupdate_scripts_classes[22m | MotoreComb[39m[0m
+[  31% ] [90m[1mupdate_scripts_classes[22m | Regolamento[39m[0m
+[  36% ] [90m[1mupdate_scripts_classes[22m | Risorse[39m[0m
+[  42% ] [90m[1mupdate_scripts_classes[22m | TabellaCRT[39m[0m
+[  47% ] [90m[1mupdate_scripts_classes[22m | Tavola[39m[0m
+[  52% ] [90m[1mupdate_scripts_classes[22m | Tutorial[39m[0m
+[  57% ] [90m[1mupdate_scripts_classes[22m | Vista3D[39m[0m
+[  63% ] [90m[1mupdate_scripts_classes[22m | Widget[39m[0m
+[  68% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  73% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  78% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  84% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[  89% ] [90m[1mupdate_scripts_classes[22m | [39m[0m
+[92m[ DONE ][39m [1mupdate_scripts_classes[22m
+[0m
+[   0% ] [90m[1m_update_scan_actions[22m | Started Scanning actions... (68 steps)[39m[0m
+[   0% ] [90m[1m_update_scan_actions[22m | f_altare.webp[39m[0m
+[   1% ] [90m[1m_update_scan_actions[22m | f_botola.webp[39m[0m
+[   2% ] [90m[1m_update_scan_actions[22m | f_fontana.webp[39m[0m
+[   4% ] [90m[1m_update_scan_actions[22m | f_mobili.webp[39m[0m
+[   5% ] [90m[1m_update_scan_actions[22m | f_opera.webp[39m[0m
+[   7% ] [90m[1m_update_scan_actions[22m | f_scala.webp[39m[0m
+[   8% ] [90m[1m_update_scan_actions[22m | f_specchio.webp[39m[0m
+[  10% ] [90m[1m_update_scan_actions[22m | f_statua.webp[39m[0m
+[  11% ] [90m[1m_update_scan_actions[22m | gateway.webp[39m[0m
+[  13% ] [90m[1m_update_scan_actions[22m | hellgate.webp[39m[0m
+[  14% ] [90m[1m_update_scan_actions[22m | party.webp[39m[0m
+[  15% ] [90m[1m_update_scan_actions[22m | Decorato.ttf[39m[0m
+[  17% ] [90m[1m_update_scan_actions[22m | Maiuscoletto.ttf[39m[0m
+[  18% ] [90m[1m_update_scan_actions[22m | Testo.ttf[39m[0m
+[  20% ] [90m[1m_update_scan_actions[22m | Titoli.ttf[39m[0m
+[  21% ] [90m[1m_update_scan_actions[22m | h_almuric.webp[39m[0m
+[  23% ] [90m[1m_update_scan_actions[22m | h_alric.webp[39m[0m
+[  24% ] [90m[1m_update_scan_actions[22m | h_curvenol.webp[39m[0m
+[  26% ] [90m[1m_update_scan_actions[22m | h_dalmilandril.webp[39m[0m
+[  27% ] [90m[1m_update_scan_actions[22m | h_dierdra.webp[39m[0m
+[  28% ] [90m[1m_update_scan_actions[22m | h_eodred.webp[39m[0m
+[  30% ] [90m[1m_update_scan_actions[22m | h_gerudirr.webp[39m[0m
+[  31% ] [90m[1m_update_scan_actions[22m | h_gilith.webp[39m[0m
+[  33% ] [90m[1m_update_scan_actions[22m | h_gislan.webp[39m[0m
+[  34% ] [90m[1m_update_scan_actions[22m | h_gwaigilion.webp[39m[0m
+[  36% ] [90m[1m_update_scan_actions[22m | h_larraka.webp[39m[0m
+[  37% ] [90m[1m_update_scan_actions[22m | h_linfalas.webp[39m[0m
+[  39% ] [90m[1m_update_scan_actions[22m | h_lord_dil.webp[39m[0m
+[  40% ] [90m[1m_update_scan_actions[22m | h_maytwist.webp[39m[0m
+[  42% ] [90m[1m_update_scan_actions[22m | h_paladin_glade.webp[39m[0m
+[  43% ] [90m[1m_update_scan_actions[22m | h_raman.webp[39m[0m
+[  44% ] [90m[1m_update_scan_actions[22m | h_sliggoth.webp[39m[0m
+[  46% ] [90m[1m_update_scan_actions[22m | h_stephen.webp[39m[0m
+[  47% ] [90m[1m_update_scan_actions[22m | h_theregond.webp[39m[0m
+[  49% ] [90m[1m_update_scan_actions[22m | h_weldron.webp[39m[0m
+[  50% ] [90m[1m_update_scan_actions[22m | h_wendolyn.webp[39m[0m
+[  52% ] [90m[1m_update_scan_actions[22m | h_zareth.webp[39m[0m
+[  53% ] [90m[1m_update_scan_actions[22m | h_zurik.webp[39m[0m
+[  55% ] [90m[1m_update_scan_actions[22m | i_elfo_f.webp[39m[0m
+[  56% ] [90m[1m_update_scan_actions[22m | i_elfo_m.webp[39m[0m
+[  57% ] [90m[1m_update_scan_actions[22m | i_nano_f.webp[39m[0m
+[  59% ] [90m[1m_update_scan_actions[22m | i_nano_m.webp[39m[0m
+[  60% ] [90m[1m_update_scan_actions[22m | i_umano_f.webp[39m[0m
+[  62% ] [90m[1m_update_scan_actions[22m | i_umano_m.webp[39m[0m
+[  63% ] [90m[1m_update_scan_actions[22m | m_arpia.webp[39m[0m
+[  65% ] [90m[1m_update_scan_actions[22m | m_chimera.webp[39m[0m
+[  66% ] [90m[1m_update_scan_actions[22m | m_cronk.webp[39m[0m
+[  68% ] [90m[1m_update_scan_actions[22m | m_demone.webp[39m[0m
+[  69% ] [90m[1m_update_scan_actions[22m | m_eroe_m.webp[39m[0m
+[  71% ] [90m[1m_update_scan_actions[22m | m_gargoyle.webp[39m[0m
+[  72% ] [90m[1m_update_scan_actions[22m | m_idra.webp[39m[0m
+[  73% ] [90m[1m_update_scan_actions[22m | m_lupo.webp[39m[0m
+[  75% ] [90m[1m_update_scan_actions[22m | m_mago_m.webp[39m[0m
+[  76% ] [90m[1m_update_scan_actions[22m | m_medusa.webp[39m[0m
+[  78% ] [90m[1m_update_scan_actions[22m | m_minotauro.webp[39m[0m
+[  79% ] [90m[1m_update_scan_actions[22m | m_ogre.webp[39m[0m
+[  81% ] [90m[1m_update_scan_actions[22m | m_orco.webp[39m[0m
+[  82% ] [90m[1m_update_scan_actions[22m | m_scheletro.webp[39m[0m
+[  84% ] [90m[1m_update_scan_actions[22m | m_troll.webp[39m[0m
+[  85% ] [90m[1m_update_scan_actions[22m | m_vampiro.webp[39m[0m
+[  86% ] [90m[1m_update_scan_actions[22m | m_warg.webp[39m[0m
+[  88% ] [90m[1m_update_scan_actions[22m | m_wight.webp[39m[0m
+[  89% ] [90m[1m_update_scan_actions[22m | m_wraith.webp[39m[0m
+[  91% ] [90m[1m_update_scan_actions[22m | m_x.webp[39m[0m
+[  92% ] [90m[1m_update_scan_actions[22m | muro.webp[39m[0m
+[  94% ] [90m[1m_update_scan_actions[22m | pavimento.webp[39m[0m
+[  95% ] [90m[1m_update_scan_actions[22m | copertina.webp[39m[0m
+[  97% ] [90m[1m_update_scan_actions[22m | icona.png[39m[0m
+[92m[ DONE ][39m [1m_update_scan_actions[22m
+[0m
+[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (68 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   1% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   2% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   4% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   5% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   7% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   8% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  10% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  11% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  13% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  14% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  15% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  17% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  18% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  20% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  21% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  23% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  24% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  26% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  27% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  28% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  30% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  31% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  33% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  34% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  36% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  37% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  39% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  40% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  42% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  43% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  44% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  46% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  47% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  49% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  50% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  52% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  53% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  55% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  56% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  57% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  59% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  60% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  62% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  63% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  65% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  66% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  68% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  69% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  71% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  72% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  73% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  75% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  76% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  78% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  79% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  81% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  82% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  84% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  85% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  86% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  88% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  89% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  91% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  92% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  94% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  95% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[  97% ] [90m[1mreimport[22m | Preparing files to reimport...[39m[0m
+[   0% ] [90m[1mreimport[22m | Executing pre-reimport operations...[39m[0m
+[   0% ] [90m[1mreimport[22m | Titoli.ttf[39m[0m
+[   1% ] [90m[1mreimport[22m | Testo.ttf[39m[0m
+[   2% ] [90m[1mreimport[22m | Maiuscoletto.ttf[39m[0m
+[   4% ] [90m[1mreimport[22m | Decorato.ttf[39m[0m
+[   5% ] [90m[1mreimport[22m | Titoli.ttf[39m[0m
+[   7% ] [90m[1mreimport[22m | Testo.ttf[39m[0m
+[   8% ] [90m[1mreimport[22m | Maiuscoletto.ttf[39m[0m
+[  10% ] [90m[1mreimport[22m | Decorato.ttf[39m[0m
+[  11% ] [90m[1mreimport[22m | m_lupo.webp[39m[0m
+[  13% ] [90m[1mreimport[22m | m_idra.webp[39m[0m
+[  14% ] [90m[1mreimport[22m | m_gargoyle.webp[39m[0m
+[  15% ] [90m[1mreimport[22m | m_eroe_m.webp[39m[0m
+[  17% ] [90m[1mreimport[22m | m_demone.webp[39m[0m
+[  18% ] [90m[1mreimport[22m | m_cronk.webp[39m[0m
+[  20% ] [90m[1mreimport[22m | m_chimera.webp[39m[0m
+[  21% ] [90m[1mreimport[22m | m_arpia.webp[39m[0m
+[  23% ] [90m[1mreimport[22m | i_umano_m.webp[39m[0m
+[  24% ] [90m[1mreimport[22m | i_umano_f.webp[39m[0m
+[  26% ] [90m[1mreimport[22m | i_nano_m.webp[39m[0m
+[  27% ] [90m[1mreimport[22m | i_nano_f.webp[39m[0m
+[  28% ] [90m[1mreimport[22m | i_elfo_m.webp[39m[0m
+[  30% ] [90m[1mreimport[22m | i_elfo_f.webp[39m[0m
+[  31% ] [90m[1mreimport[22m | h_zurik.webp[39m[0m
+[  33% ] [90m[1mreimport[22m | h_zareth.webp[39m[0m
+[  34% ] [90m[1mreimport[22m | m_mago_m.webp[39m[0m
+[  36% ] [90m[1mreimport[22m | m_medusa.webp[39m[0m
+[  37% ] [90m[1mreimport[22m | m_minotauro.webp[39m[0m
+[  39% ] [90m[1mreimport[22m | m_ogre.webp[39m[0m
+[  40% ] [90m[1mreimport[22m | m_orco.webp[39m[0m
+[  42% ] [90m[1mreimport[22m | m_scheletro.webp[39m[0m
+[  43% ] [90m[1mreimport[22m | m_troll.webp[39m[0m
+[  44% ] [90m[1mreimport[22m | m_vampiro.webp[39m[0m
+[  46% ] [90m[1mreimport[22m | m_warg.webp[39m[0m
+[  47% ] [90m[1mreimport[22m | m_wight.webp[39m[0m
+[  49% ] [90m[1mreimport[22m | m_wraith.webp[39m[0m
+[  50% ] [90m[1mreimport[22m | m_x.webp[39m[0m
+[  52% ] [90m[1mreimport[22m | muro.webp[39m[0m
+[  53% ] [90m[1mreimport[22m | pavimento.webp[39m[0m
+[  55% ] [90m[1mreimport[22m | copertina.webp[39m[0m
+[  56% ] [90m[1mreimport[22m | icona.png[39m[0m
+[  57% ] [90m[1mreimport[22m | f_altare.webp[39m[0m
+[  59% ] [90m[1mreimport[22m | f_botola.webp[39m[0m
+[  60% ] [90m[1mreimport[22m | f_fontana.webp[39m[0m
+[  62% ] [90m[1mreimport[22m | f_mobili.webp[39m[0m
+[  63% ] [90m[1mreimport[22m | f_opera.webp[39m[0m
+[  65% ] [90m[1mreimport[22m | f_scala.webp[39m[0m
+[  66% ] [90m[1mreimport[22m | f_specchio.webp[39m[0m
+[  68% ] [90m[1mreimport[22m | f_statua.webp[39m[0m
+[  69% ] [90m[1mreimport[22m | gateway.webp[39m[0m
+[  71% ] [90m[1mreimport[22m | hellgate.webp[39m[0m
+[  72% ] [90m[1mreimport[22m | party.webp[39m[0m
+[  73% ] [90m[1mreimport[22m | h_almuric.webp[39m[0m
+[  75% ] [90m[1mreimport[22m | h_alric.webp[39m[0m
+[  76% ] [90m[1mreimport[22m | h_curvenol.webp[39m[0m
+[  78% ] [90m[1mreimport[22m | h_dalmilandril.webp[39m[0m
+[  79% ] [90m[1mreimport[22m | h_dierdra.webp[39m[0m
+[  81% ] [90m[1mreimport[22m | h_eodred.webp[39m[0m
+[  82% ] [90m[1mreimport[22m | h_gerudirr.webp[39m[0m
+[  84% ] [90m[1mreimport[22m | h_gilith.webp[39m[0m
+[  85% ] [90m[1mreimport[22m | h_gislan.webp[39m[0m
+[  86% ] [90m[1mreimport[22m | h_gwaigilion.webp[39m[0m
+[  88% ] [90m[1mreimport[22m | h_larraka.webp[39m[0m
+[  89% ] [90m[1mreimport[22m | h_linfalas.webp[39m[0m
+[  91% ] [90m[1mreimport[22m | h_lord_dil.webp[39m[0m
+[  92% ] [90m[1mreimport[22m | h_maytwist.webp[39m[0m
+[  94% ] [90m[1mreimport[22m | h_paladin_glade.webp[39m[0m
+[  95% ] [90m[1mreimport[22m | h_raman.webp[39m[0m
+[  97% ] [90m[1mreimport[22m | h_sliggoth.webp[39m[0m
+[  98% ] [90m[1mreimport[22m | Finalizing Asset Import...[39m[0m
+[92m[ DONE ][39m [1mreimport[22m
+[0m
+[   0% ] [90m[1mreimport[22m | Started (Re)Importing Assets (68 steps)[39m[0m
+[   0% ] [90m[1mreimport[22m | Executing post-reimport operations...[39m[0m
+[92m[ DONE ][39m [1mreimport[22m
+[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Started Loading editor (5 steps)[39m[0m
+[   0% ] [90m[1mloading_editor_layout[22m | Loading editor layout...[39m[0m
+[  16% ] [90m[1mloading_editor_layout[22m | Loading docks...[39m[0m
+[92m[ DONE ][39m [1mloading_editor_layout[22m
+[0m

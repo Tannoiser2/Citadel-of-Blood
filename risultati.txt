@@ -1,0 +1,130 @@
+Decorato.ttf: mancano '→−≤'
+Maiuscoletto.ttf: tutti i 105 caratteri presenti
+Testo.ttf: tutti i 105 caratteri presenti
+Titoli.ttf: mancano '→≤'
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+compilazione riuscita
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+ok  CRT spada 9 → 1 ferita
+ok  CRT martello 17+ → 5
+ok  CRT mostri 5/6
+ok  negoziazione
+ok  corruzione 100 marchi, colonna 10-12 → 4
+ok  tesoro C al livello 3 diventa E
+ok  rotazione delle uscite
+ok  100 tessere caricate
+ok  iniziato umano con esperienza: 7+1 PF
+ok  Potenziale Magico tiro 6 → 2/2/2
+ok  Almuric conosce 2 incantesimi (PM 1/1/2)
+ok  dopo l'avvio c'è una scelta
+ok  9.3: A attacca 1
+ok  9.3: B sceglie tra 2 e 3
+ok  9.3: un solo mostro al centro può colpire tutti e tre
+ok  9.3: il personaggio a sinistra colpisce il mostro al centro
+ok  ogni faccia di tessera ha almeno un'uscita
+ok  il tesoro L contiene oggetti magici (255)
+tutti i controlli superati
+Godot Engine v4.7.stable.official.5b4e0cb0f - https://godotengine.org
+
+--- partita 0: sconfitta, turno 48, 15 segmenti, ultime righe: [{ "t": "Cronk attacca Borin (attacco): tira 4 +4 = 8 → 1 ferita.", "k": "dado", "turno": 48 }, { "t": "Borin è caduto.", "k": "morte", "turno": 48 }, { "t": "Il gruppo è stato annientato nella Cittadella di Sangue.", "k": "titolo", "turno": 48 }]
+--- partita 1: sconfitta, turno 133, 30 segmenti, ultime righe: [{ "t": "Spettro attacca Stephen il Paladino (attacco): tira 1 +6 = 7 → 1 ferita.", "k": "dado", "turno": 133 }, { "t": "Stephen il Paladino è caduto.", "k": "morte", "turno": 133 }, { "t": "Il gruppo è stato annientato nella Cittadella di Sangue.", "k": "titolo", "turno": 133 }]
+--- partita 2: sconfitta, turno 33, 18 segmenti, ultime righe: [{ "t": "Cronk attacca Linfalas (attacco): tira 2 +4 = 6 → 1 ferita.", "k": "dado", "turno": 33 }, { "t": "Linfalas è caduto.", "k": "morte", "turno": 33 }, { "t": "Il gruppo è stato annientato nella Cittadella di Sangue.", "k": "titolo", "turno": 33 }]
+partite 80: vittorie 3, sconfitte 77, uscite 0; turni medi 55.4; segmenti medi 22.3; Porta trovata 6 volte; mostri uccisi 2007; livelli visitati in media 1.9; Porte distrutte 5
+partite automatiche riuscite
+   Borin attacca Orco (Ascia): tira 6 +2 = 8 → 1 ferita.
+passo 13 ok: att|m:2 -> azione
+   Corrado impugna Pugnale da lancio.
+passo 14 ok: cambia -> azione
+   Dalmilandril attacca Orco (Arco): tira 5 +4 = 9 → 1 ferita.
+   Orco è ucciso.
+passo 15 ok: arc|m:2 -> azione
+   Lithiel lancia Scarica su Orco.
+   Orco tenta di resistere a Scarica: tira 4 contro VR 1, non resiste.
+   Orco è ucciso.
+   Orco attacca Gislan (Spada): tira 3 +3 = 6 → 1 ferita.
+passo 16 ok: inc|bl|m:1 -> riorg
+passo 17 ok: prosegui -> azione
+   Gislan attacca Orco (Ascia): tira 4 +6 = 10 → 2 ferite.
+   Orco è ucciso.
+   Ogni sopravvissuto guadagna 9 punti esperienza.
+   Tesoro (tipo H): 7 marchi d'oro, un gioiello da 50 (a Gislan).
+   Tesoro (tipo H): 4 marchi d'oro, una pozione misteriosa.
+   Tesoro (tipo H): 12 marchi d'oro.
+passo 18 ok: att|m:3 -> tesoro
+   Gislan beve: Pozione di Guarigione.
+   Gislan guarisce 1 ferita.
+   Gislan conserva una dose.
+passo 19 ok: a|gislan -> elemento
+   Corrado indaga fontana: tira 4 → Gioiello.
+   Nell'acqua brilla un gioiello da 150 marchi: lo prende Corrado.
+passo 20 ok: ind|ini3 -> conferma
+passo 21 ok: ok -> rotta
+   Controllo dei mostri erranti: 1 → arrivano dei mostri!
+   Tabella dei mostri erranti: 2 e 5 → Orco × 1.
+passo 22 ok: vai|3 -> incontro
+   Gislan lancia Oratoria.
+   Oratoria: +4 alla prossima negoziazione.
+passo 23 ok: incn|gislan|or -> incontro
+   Gislan negozia: 5+4 − 0 (Valore di Negoziazione) +4 = 13 → Intimidazione.
+   I mostri sono intimiditi e cedono un quarto del loro oro.
+   Il gruppo riceve 1 marchi d'oro.
+passo 24 ok: neg|gislan -> incontro
+passo 25 ok: lascia -> rotta
+tutorial completo: 23 azioni guidate
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+     at: set_use_vsync (platform/linuxbsd/x11/gl_manager_x11.cpp:372)
+combattimento_1024x768.jpg
+combattimento_1366x1024.jpg
+combattimento_1440x900.jpg
+crea_1024x768.jpg
+crea_1440x900.jpg
+fine_1440x900.jpg
+gioco_1024x768.jpg
+gioco_1366x1024.jpg
+gioco_1440x900.jpg
+gioco_844x390.jpg
+labirinto_1024x768.jpg
+labirinto_1440x900.jpg
+menu_1024x768.jpg
+menu_1440x900.jpg
+regole_1440x900.jpg
+scheda_1024x768.jpg
+tabelle_1440x900.jpg
+tutorial_1024x768.jpg
+tutorial_1440x900.jpg
+[  98% ] [90m[1msavepack[22m | Storing File: res://assets/ui/icona.png[39m[0m
+[  98% ] [90m[1msavepack[22m | Storing File: res://.godot/uid_cache.bin[39m[0m
+[  98% ] [90m[1msavepack[22m | Storing File: res://project.binary[39m[0m
+[92m[ DONE ][39m [1msavepack[22m
+[0m
+total 65924
+drwxr-xr-x 2 runner runner     4096 Nov 27 10:06 .
+drwxr-xr-x 3 runner runner     4096 Nov 27 10:06 ..
+-rw-r--r-- 1 runner runner     4233 Nov 27 10:06 index.apple-touch-icon.png
+-rw-r--r-- 1 runner runner     2973 Nov 27 10:06 index.audio.position.worklet.js
+-rw-r--r-- 1 runner runner     7298 Nov 27 10:06 index.audio.worklet.js
+-rw-r--r-- 1 runner runner     5485 Nov 27 10:06 index.html
+-rw-r--r-- 1 runner runner     3602 Nov 27 10:06 index.icon.png
+-rw-r--r-- 1 runner runner   279815 Nov 27 10:06 index.js
+-rw-r--r-- 1 runner runner 27646508 Nov 27 10:06 index.pck
+-rw-r--r-- 1 runner runner    21443 Nov 27 10:06 index.png
+-rw-r--r-- 1 runner runner 39509339 Nov 27 10:06 index.wasm
