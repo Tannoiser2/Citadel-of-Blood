@@ -595,12 +595,13 @@ func _pedina(uid: String, nome_tex: String, scala: float, colore: Color, etichet
 			l.text = etichetta
 			l.font = Risorse.font("Testo")
 			l.font_size = 40
-			l.pixel_size = 0.0035
+			l.pixel_size = 0.0028
+			l.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 			l.outline_size = 10
 			l.modulate = Color(1, 0.93, 0.8)
 			l.outline_modulate = Color(0, 0, 0, 0.9)
 			l.double_sided = false
-			l.position = Vector3(0, bordo + 0.07 * scala, lato * (sp / 2.0 + 0.004))
+			l.position = Vector3(0, bordo + 0.04 * scala, lato * (sp / 2.0 + 0.004))
 			if lato < 0: l.rotation.y = PI
 			l.render_priority = 2
 			carta.add_child(l)
@@ -689,7 +690,7 @@ func aggiorna_pedine() -> void:
 			if uid == "": continue
 			var u = motore.unita(uid)
 			if u.is_empty(): continue
-			var pos = centro + Vector3((col - 1) * 0.62, 0, 0.35 + r * 0.55)
+			var pos = centro + Vector3((col - 1) * 0.72, 0, 0.4 + r * 0.64)
 			if not in_comb: pos.z -= 0.1
 			_metti_pedina(uid, u.get("ritratto", ""), pos, 1.0, Color(0.55, 0.45, 0.25), u.get("nome", ""), 0.0, vivi)
 	# mostri in combattimento o nell'incontro
@@ -713,7 +714,7 @@ func aggiorna_pedine() -> void:
 				if u2.is_empty(): continue
 				nome_tex = u2.get("ritratto", "")
 				nm = u2.get("nome", "")
-			var pos2 = centro + Vector3((col - 1) * 0.62, 0, -0.45 - r * 0.55)
+			var pos2 = centro + Vector3((col - 1) * 0.72, 0, -0.5 - r * 0.64)
 			_metti_pedina(uid2, nome_tex, pos2, 1.15 if uid2 != "hellgate" else 1.6, Color(0.45, 0.08, 0.08), nm, PI, vivi)
 	# mostri lasciati in altri segmenti
 	for k in motore.mappa(liv)["seg"]:
@@ -765,7 +766,7 @@ func aggiorna_pedine() -> void:
 func posto_3d(col: int, riga: int) -> Vector3:
 	var xy = MotoreBase.da_chiave(motore.s["pos"]["xy"])
 	var centro = Vector3(xy.x * LATO, 0, xy.y * LATO)
-	var p = centro + Vector3((col - 1) * 0.62, 0, 0.35 + riga * 0.55)
+	var p = centro + Vector3((col - 1) * 0.72, 0, 0.4 + riga * 0.64)
 	if not interazione["in_comb"]: p.z -= 0.1
 	return p
 
