@@ -113,13 +113,6 @@ func _process(delta: float) -> void:
 		perno.position = perno.position.lerp(bersaglio_perno, clamp(delta * 4.0, 0.0, 1.0))
 		_aggiorna_camera()
 	luce_torcia.position = luce_torcia.position.lerp(bersaglio_perno + Vector3(0, 2.4, 0), clamp(delta * 3.0, 0.0, 1.0))
-	if cam != null:
-		var b = cam.global_transform.basis
-		for k in pedine:
-			var pn = pedine[k]
-			if is_instance_valid(pn) and pn.has_node("Carta"):
-				var c3: Node3D = pn.get_node("Carta")
-				c3.global_transform.basis = b
 
 func centra_su(liv: int, k: String) -> void:
 	var xy = MotoreBase.da_chiave(k)
@@ -448,7 +441,7 @@ func _pedina(uid: String, nome_tex: String, scala: float, colore: Color, etichet
 	base.material_override = mb
 	base.position.y = 0.025
 	n.add_child(base)
-	# la carta del personaggio è sempre rivolta verso la camera (si legge da ogni angolo)
+	# la carta del personaggio sta in piedi, ferma sul tavolo (non segue la camera)
 	var carta = Node3D.new()
 	carta.name = "Carta"
 	carta.position.y = 0.05
@@ -461,6 +454,7 @@ func _pedina(uid: String, nome_tex: String, scala: float, colore: Color, etichet
 	mq.albedo_texture = Risorse.tex(nome_tex)
 	mq.albedo_color = Color(0.86, 0.84, 0.82)
 	mq.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mq.cull_mode = BaseMaterial3D.CULL_DISABLED
 	q.material_override = mq
 	q.position = Vector3(0, 0.3 * scala + 0.03, 0.004)
 	carta.add_child(q)
@@ -471,6 +465,7 @@ func _pedina(uid: String, nome_tex: String, scala: float, colore: Color, etichet
 	var mc = StandardMaterial3D.new()
 	mc.albedo_color = colore
 	mc.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	mc.cull_mode = BaseMaterial3D.CULL_DISABLED
 	cor.material_override = mc
 	cor.position = Vector3(0, 0.3 * scala + 0.03, 0.0)
 	carta.add_child(cor)
